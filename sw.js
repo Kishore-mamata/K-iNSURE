@@ -1,7 +1,7 @@
 /* K-iNSURE service worker: makes the app work offline.
    IMPORTANT: change CACHE_VERSION every time you publish an update,
    so installed apps download the new files. */
-const CACHE_VERSION = 'kinsure-v1.3.1';
+const CACHE_VERSION = 'kinsure-v1.4.0';
 
 const APP_FILES = [
   './',
@@ -18,9 +18,12 @@ const APP_FILES = [
   './icons/favicon-32.png'
 ];
 
+/* Install: always download fresh copies (skip the browser's own HTTP cache). */
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_VERSION).then((cache) => cache.addAll(APP_FILES)).then(() => self.skipWaiting())
+    caches.open(CACHE_VERSION)
+      .then((cache) => cache.addAll(APP_FILES.map((u) => new Request(u, { cache: 'reload' }))))
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -32,16 +35,36 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-/* Serve from cache first (fast, works offline), then refresh the cache in the background. */
+function isPage(url, req) {
+  return req.mode === 'navigate' || /\.(html|webmanifest|js)$/.test(url.pathname) || url.pathname.endsWith('/');
+}
+
+/* Pages and calculators: online = fresh copy from the website (and saved for offline);
+   offline or very slow network = the saved copy.
+   Icons: saved copy first. */
 self.addEventListener('fetch', (event) => {
   const req = event.request;
-  if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) return;
+  const url = new URL(req.url);
+  if (req.method !== 'GET' || url.origin !== self.location.origin) return;
+
+  if (isPage(url, req)) {
+    event.respondWith(
+      caches.open(CACHE_VERSION).then((cache) => {
+        const network = fetch(req.url, { cache: 'no-cache', credentials: 'same-origin' })
+          .then((res) => { if (res && res.ok) cache.put(req.url, res.clone()); return res; });
+        const timeout = new Promise((resolve) => setTimeout(resolve, 5000));
+        return Promise.race([network.catch(() => null), timeout]).then((res) =>
+          res || cache.match(req, { ignoreSearch: true }).then((cached) => cached || network)
+        );
+      })
+    );
+    return;
+  }
+
   event.respondWith(
     caches.open(CACHE_VERSION).then((cache) =>
       cache.match(req, { ignoreSearch: true }).then((cached) => {
-        const network = fetch(req)
-          .then((res) => { if (res && res.ok) cache.put(req, res.clone()); return res; })
-          .catch(() => cached);
+        const network = fetch(req).then((res) => { if (res && res.ok) cache.put(req, res.clone()); return res; }).catch(() => cached);
         return cached || network;
       })
     )
