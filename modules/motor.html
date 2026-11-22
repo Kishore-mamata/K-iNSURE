@@ -8547,3 +8547,35 @@ html body #kinsureWelcome#kinsureWelcome>button:hover{transform:translateY(-2px)
   #kinsureStartPolicy#kinsureStartPolicy#kinsureStartPolicy{flex:1 1 100%!important;width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
 }
 </style>
+<style id="kinsure-notes-owner-only">
+body:not(.k-owner) .k-owner-only{display:none!important}
+.k-notes-back{margin:0 0 12px;display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 16px;border:1px solid #cfe0e0;border-radius:10px;background:#fff;color:#0b6f71;font-weight:700;font-size:14px;cursor:pointer}
+</style>
+<script id="kinsure-notes-owner-only-script">
+(function(){
+  /* Notes & Quick Calc: Owner only. Motor always opens on the calculator. */
+  var notesBtn=document.querySelector('.header-action-btn[onclick*="tab-notes"]');
+  if(notesBtn)notesBtn.classList.add('k-owner-only');
+  var panel=document.getElementById('tab-notes');
+  if(panel){
+    var back=document.createElement('button');
+    back.type='button';back.className='k-notes-back';back.textContent='\u2190 Back to calculator';
+    back.onclick=function(){switchKinsureTab('tab-motor');};
+    var wrap=panel.querySelector('.kcalc-wrap')||panel;
+    wrap.insertBefore(back,wrap.firstChild);
+  }
+  function setRole(role){
+    var owner=role==='owner';
+    document.body.classList.toggle('k-owner',owner);
+    if(!owner&&panel&&!panel.hidden)switchKinsureTab('tab-motor');
+  }
+  window.addEventListener('message',function(e){
+    if(e.data&&e.data.type==='kinsure-role-update')setRole(e.data.role);
+  });
+  setRole('user');
+  window.addEventListener('DOMContentLoaded',function(){
+    try{localStorage.removeItem('kinsure_active_tab');}catch(e){}
+    if(typeof switchKinsureTab==='function')switchKinsureTab('tab-motor');
+  });
+})();
+</script>
