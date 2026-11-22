@@ -1,0 +1,22 @@
+{
+  "name": "K-iNSURE Insurance Suite",
+  "short_name": "K-iNSURE",
+  "description": "Motor and Fire insurance premium calculator with quotations.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f1f4f9",
+  "theme_color": "#0f2747",
+  "categories": ["business", "finance", "productivity"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Motor Calculator", "short_name": "Motor", "url": "./#motor", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Fire Calculator", "short_name": "Fire", "url": "./#fire", "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
