@@ -1,11 +1,13 @@
 /* K-iNSURE service worker: makes the app work offline.
    IMPORTANT: change CACHE_VERSION every time you publish an update,
    so installed apps download the new files. */
-const CACHE_VERSION = 'kinsure-v1.0.1';
+const CACHE_VERSION = 'kinsure-v1.2.0';
 
 const APP_FILES = [
   './',
   './index.html',
+  './mobile.html',
+  './mobile.webmanifest',
   './manifest.webmanifest',
   './modules/motor.html',
   './modules/fire.html',
