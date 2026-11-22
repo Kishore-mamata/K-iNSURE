@@ -8700,3 +8700,39 @@ html body #tab-motor #prev#prev#prev .pv-bar.k-actions #psave{background:#0f2747
   /* 4. Save Quotation keeps its existing behaviour */
 })();
 </script>
+<style id="kinsure-quote-align">
+/* --- Buttons: one even grid --- */
+html body #tab-motor #prev#prev#prev .pv-bar.k-actions{grid-template-columns:1fr 1fr!important;gap:8px!important}
+html body #tab-motor #prev#prev#prev .pv-bar.k-actions .btn,
+html body #tab-motor #prev#prev#prev .pv-bar.k-actions #pback{width:100%!important;height:48px!important;min-height:48px!important;padding:0 8px!important;font-size:13.5px!important;line-height:1.2!important;white-space:nowrap!important;justify-content:center!important;align-items:center!important;margin:0!important}
+html body #tab-motor #prev#prev#prev .pv-bar.k-actions #pback{grid-column:1/-1!important;justify-self:stretch!important;height:42px!important;min-height:42px!important;background:#fff!important;color:#0f2747!important;border:1px solid #cdd8e6!important;box-shadow:none!important}
+@media (min-width:700px){html body #tab-motor #prev#prev#prev .pv-bar.k-actions{grid-template-columns:repeat(5,minmax(0,1fr))!important}html body #tab-motor #prev#prev#prev .pv-bar.k-actions #pback{grid-column:auto!important;height:48px!important;min-height:48px!important}}
+/* --- Premium boxes: equal height, headings level, totals on one line --- */
+html body #tab-motor#tab-motor #prev#prev#prev .qpremium{align-items:stretch!important}
+html body #tab-motor#tab-motor #prev#prev#prev .qpremium>.qhalf{display:flex!important;flex-direction:column!important;height:auto!important}
+html body #tab-motor#tab-motor #prev#prev#prev .qpremium .qhead{text-align:center!important;white-space:normal!important;overflow:visible!important;display:flex!important;align-items:center!important;justify-content:center!important;min-height:2.8em!important;line-height:1.3!important}
+html body #tab-motor#tab-motor #prev#prev#prev .qpremium>.qhalf>table{flex:1 1 auto!important;display:flex!important;flex-direction:column!important;width:100%!important}
+html body #tab-motor#tab-motor #prev#prev#prev .qpremium>.qhalf>table>tbody{flex:1 1 auto!important;display:flex!important;flex-direction:column!important;width:100%!important}
+html body #tab-motor#tab-motor #prev#prev#prev .qpremium tr{display:flex!important;width:100%!important;align-items:baseline!important;justify-content:space-between!important;gap:8px!important}
+html body #tab-motor#tab-motor #prev#prev#prev .qpremium td{flex:1 1 auto!important}
+html body #tab-motor#tab-motor #prev#prev#prev .qpremium td:last-child{flex:0 0 auto!important;white-space:nowrap!important;text-align:right!important}
+html body #tab-motor#tab-motor #prev#prev#prev .qpremium tr.qsubtotal{margin-top:auto!important;border-top:1.5px solid #c9d6e6!important;border-bottom:0!important;padding-top:8px!important}
+html body #tab-motor#tab-motor #prev#prev#prev .qpremium tr.qsubtotal td{font-weight:800!important;color:#0f2747!important}
+/* --- Total payable: symbol and amount stay together --- */
+html body #tab-motor#tab-motor #prev#prev#prev .qgrand,html body #tab-motor#tab-motor #prev#prev#prev .qnet{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important}
+html body #tab-motor#tab-motor #prev#prev#prev .qgrand strong,html body #tab-motor#tab-motor #prev#prev#prev .qnet strong{white-space:nowrap!important;flex:0 0 auto!important;display:block!important}
+html body #tab-motor#tab-motor #prev#prev#prev .qgrand span,html body #tab-motor#tab-motor #prev#prev#prev .qnet span{flex:1 1 auto!important;min-width:0!important}
+@media (max-width:460px){
+  html body #tab-motor#tab-motor #prev#prev#prev .qpremium{gap:8px!important}
+  html body #tab-motor#tab-motor #prev#prev#prev .qpremium>.qhalf{padding:10px 8px!important}
+  html body #tab-motor#tab-motor #prev#prev#prev .qpremium .qhead{font-size:10px!important;letter-spacing:.04em!important;padding:2px 0 8px!important;margin:0 0 2px!important}
+  html body #tab-motor#tab-motor #prev#prev#prev .qpremium tr{flex-direction:column!important;align-items:stretch!important;gap:2px!important;padding:7px 0!important;border-bottom:1px solid #e6edf5!important}
+  html body #tab-motor#tab-motor #prev#prev#prev .qpremium td{font-size:11.5px!important;line-height:1.3!important;padding:0!important}
+  html body #tab-motor#tab-motor #prev#prev#prev .qpremium td:last-child{font-size:12px!important;font-weight:700!important;color:#14233d!important;padding:0!important}
+  html body #tab-motor#tab-motor #prev#prev#prev .qpremium tr.qsubtotal{padding-top:8px!important}
+  html body #tab-motor#tab-motor #prev#prev#prev .qpremium tr.qsubtotal td{font-size:12px!important}
+  html body #tab-motor#tab-motor #prev#prev#prev .qpremium tr.qsubtotal td:last-child{font-size:13px!important}
+  html body #tab-motor#tab-motor #prev#prev#prev .qgrand strong{font-size:24px!important}
+  html body #tab-motor#tab-motor #prev#prev#prev .qgrand span{font-size:11px!important}
+}
+</style>
