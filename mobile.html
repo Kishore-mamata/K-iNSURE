@@ -863,4 +863,51 @@ body.m-mode.m-welcome #mWelcome{display:flex}
   if(document.readyState==='complete')hide();else window.addEventListener('load',hide);
 })();
 </script>
+<!-- ===== Testing-version notice (set KINSURE_TEST_NOTICE to false to remove) ===== -->
+<style id="kinsure-test-notice">
+#kNotice{position:fixed;inset:0;z-index:6000;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(9,26,51,.55);font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif}
+#kNotice.show{display:flex}
+#kNotice .box{width:100%;max-width:380px;background:#fff;border-radius:18px;padding:24px 22px 20px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.35);border-top:6px solid #f2a51a}
+#kNotice .ico{font-size:40px;line-height:1}
+#kNotice h2{margin:10px 0 8px!important;font-size:20px!important;font-weight:800;color:#0f2747!important}
+#kNotice p{margin:0 0 18px;color:#40506a;font-size:15px;line-height:1.45}
+#kNotice button{width:100%;height:46px;border:0;border-radius:12px;background:#0b8f91;color:#fff;font-size:16px;font-weight:700;cursor:pointer}
+.k-beta{display:flex;align-items:center;gap:8px;justify-content:center;background:#fff4dc;color:#7a4b00;border:1px solid #f2c46b;border-radius:12px;padding:8px 12px;font-size:13px;font-weight:600;line-height:1.35;font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;text-align:left}
+#mWelcome .k-beta{width:100%;max-width:420px;margin:0 0 18px}
+#dashboardView>.k-beta{margin:0 0 16px;justify-content:flex-start;font-size:14px}
+</style>
+<div id="kNotice" role="dialog" aria-modal="true" aria-labelledby="kNoticeTitle"><div class="box">
+  <div class="ico">🚧</div><h2 id="kNoticeTitle">Testing version</h2>
+  <p id="kNoticeText"></p>
+  <button type="button" id="kNoticeOk">OK, understood</button>
+</div></div>
+<script id="kinsure-test-notice-script">
+(function(){
+  var KINSURE_TEST_NOTICE = true;   /* change to false when the app is complete */
+  var NOTICE_TEXT = 'This version is not fully designed. It is under construction.';
+  var STRIP_TEXT  = '🚧 Under construction: testing version';
+
+  /* Ask the phone to keep K-iNSURE's saved files and data when storage runs low */
+  try{ if(navigator.storage && navigator.storage.persist){ navigator.storage.persist(); } }catch(e){}
+
+  if(!KINSURE_TEST_NOTICE) return;
+  function strip(){ var d=document.createElement('div'); d.className='k-beta'; d.textContent=STRIP_TEXT; return d; }
+  var sub=document.querySelector('#mWelcome .m-sub');
+  if(sub) sub.parentNode.insertBefore(strip(), sub.nextSibling);
+  var dash=document.getElementById('dashboardView');
+  if(dash) dash.insertBefore(strip(), dash.firstChild);
+
+  var box=document.getElementById('kNotice');
+  document.getElementById('kNoticeText').textContent=NOTICE_TEXT;
+  document.getElementById('kNoticeOk').addEventListener('click',function(){
+    box.classList.remove('show');
+    try{ sessionStorage.setItem('kinsure_notice_seen','1'); }catch(e){}
+  });
+  var seen=false; try{ seen=sessionStorage.getItem('kinsure_notice_seen')==='1'; }catch(e){}
+  if(!seen){
+    var delay=document.getElementById('mSplash') ? 1900 : 300;   /* after the opening screen on mobile */
+    setTimeout(function(){ box.classList.add('show'); }, delay);
+  }
+})();
+</script>
 </body></html>
