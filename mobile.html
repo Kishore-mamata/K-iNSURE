@@ -842,4 +842,25 @@ body.m-mode.m-welcome #mWelcome{display:flex}
   if(typeof origSelect==='function'){window.selectRole=function(r){var w=body.classList.contains('m-welcome');origSelect(r);if(inMobile()&&w)body.classList.add('m-welcome');};}
 })();
 </script>
+<!-- ===== Opening screen (mobile) ===== -->
+<style id="kinsure-splash">
+#mSplash{position:fixed;inset:0;z-index:5000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#f1f4f9;
+  font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;transition:opacity .45s ease}
+#mSplash.hide{opacity:0;pointer-events:none}
+#mSplash img{width:150px;height:150px;border-radius:50%;object-fit:cover;box-shadow:0 14px 34px rgba(15,39,71,.28);animation:kSplashIn .6s ease both}
+#mSplash .t1{margin-top:26px;font-size:34px;font-weight:800;color:#0f2747;letter-spacing:-.01em;animation:kSplashUp .6s .15s ease both}
+#mSplash .t2{margin-top:6px;font-size:17px;font-weight:700;color:#0b8f91;letter-spacing:.14em;text-transform:uppercase;animation:kSplashUp .6s .3s ease both}
+@keyframes kSplashIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
+@keyframes kSplashUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+</style>
+<div id="mSplash" aria-hidden="true"><img id="mSplashLogo" alt=""><div class="t1">K-iNSURE</div><div class="t2">Premium Calculator</div></div>
+<script>
+(function(){
+  var sp=document.getElementById('mSplash'),lg=document.querySelector('.brand-logo');
+  if(lg)document.getElementById('mSplashLogo').src=lg.src;
+  var start=Date.now();
+  function hide(){var wait=Math.max(0,1600-(Date.now()-start));setTimeout(function(){sp.classList.add('hide');setTimeout(function(){sp.remove();},500);},wait);}
+  if(document.readyState==='complete')hide();else window.addEventListener('load',hide);
+})();
+</script>
 </body></html>
