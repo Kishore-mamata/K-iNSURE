@@ -7753,35 +7753,35 @@ body.sotp .cols > section[aria-label="Coverages"] { display:none !important; }
 (function(){
   const $=id=>document.getElementById(id);
   const addonRules={
-    ndEnabled:{classes:"pc epc w2 e2w taxi pauto gauto lorry bus c4 ec4 misc",fields:["ndEnabled","nd"]},
+    ndEnabled:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc",fields:["ndEnabled","nd"]},
     enginePlatinumEnabled:{classes:"pc epc w2 e2w taxi etaxi pauto bus",fields:["enginePlatinumEnabled","enh"]},
-    consumablesProtectEnabled:{classes:"pc epc w2 e2w taxi pauto gauto lorry bus c4 ec4",fields:["consumablesProtectEnabled","cons"]},
-    keyProtectEnabled:{classes:"pc epc taxi w2 e2w",fields:["keyProtectEnabled","keyCoverLimit"]},
+    consumablesProtectEnabled:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4",fields:["consumablesProtectEnabled","cons"]},
+    keyProtectEnabled:{classes:"pc epc taxi etaxi w2 e2w",fields:["keyProtectEnabled","keyCoverLimit"]},
     tyreRimProtectEnabled:{classes:"w2 e2w c4 ec4",fields:["tyreRimProtectEnabled"]},
     tyreRimCarProtectEnabled:{classes:"pc epc",fields:["tyreRimCarProtectEnabled","tyreRimCarCoverLimit"]},
-    rti:{classes:"pc epc w2 e2w lorry taxi pauto gauto c4 ec4 misc bus",fields:["rti"]},
-    rsa:{classes:"pc epc w2 e2w taxi pauto gauto lorry bus c4 ec4 misc",fields:["rsa"]},
-    ncbProtectEnabled:{classes:"pc epc taxi",fields:["ncbProtectEnabled"]},
-    evProtectEnabled:{classes:"pc epc e2w ec4 taxi pauto gauto lorry bus",fields:["evProtectEnabled"]},
-    personalBelongingsEnabled:{classes:"pc epc w2 e2w taxi pauto gauto lorry bus",fields:["personalBelongingsEnabled","personalBelongingsLimit"]},
-    platinumPAEnabled:{classes:"pc epc w2 e2w taxi pauto gauto lorry bus c4 ec4 misc",fields:["platinumPAEnabled","platinumPASumInsured","platinumPASeats"]},
-    engp:{classes:"pc epc w2 e2w taxi",fields:["engp"]},
-    enggear:{classes:"pc epc w2 e2w taxi",fields:["enggear"]},
-    tow:{classes:"pc epc w2 e2w taxi pauto gauto lorry bus c4 ec4 misc",fields:["towLimit","tow"]},
-    med:{classes:"pc epc w2 e2w taxi pauto gauto lorry bus c4 ec4 misc",fields:["medLimit","med"]},
-    pe:{classes:"pc epc w2 e2w taxi pauto gauto lorry bus c4 ec4 misc",fields:["peLimit","pe"]},
-    rtax:{classes:"pc epc w2 e2w taxi pauto gauto lorry bus c4 ec4 misc",fields:["rtax"]},
-    efit:{classes:"pc epc w2 e2w taxi pauto gauto lorry bus c4 ec4 misc",fields:["efit"]},
-    cng:{classes:"pc epc w2 e2w taxi pauto gauto lorry bus c4 ec4 misc",fields:["cng","cngFactoryFitted"]},
-    builtInCngEnabled:{classes:"pc epc w2 e2w taxi pauto gauto lorry bus c4 ec4 misc",fields:["builtInCngEnabled"]},
-    emiProtectEnabled:{classes:"pc epc w2 e2w taxi pauto gauto lorry bus c4 ec4 misc",fields:["emiProtectEnabled","emi"]}
+    rti:{classes:"pc epc w2 e2w lorry taxi etaxi pauto gauto c4 ec4 misc bus",fields:["rti"]},
+    rsa:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc",fields:["rsa"]},
+    ncbProtectEnabled:{classes:"pc epc taxi etaxi",fields:["ncbProtectEnabled"]},
+    evProtectEnabled:{classes:"pc epc e2w ec4 taxi etaxi pauto gauto lorry bus",fields:["evProtectEnabled"]},
+    personalBelongingsEnabled:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus",fields:["personalBelongingsEnabled","personalBelongingsLimit"]},
+    platinumPAEnabled:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc",fields:["platinumPAEnabled","platinumPASumInsured","platinumPASeats"]},
+    engp:{classes:"pc epc w2 e2w taxi etaxi",fields:["engp"]},
+    enggear:{classes:"pc epc w2 e2w taxi etaxi",fields:["enggear"]},
+    tow:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc",fields:["towLimit","tow"]},
+    med:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc",fields:["medLimit","med"]},
+    pe:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc",fields:["peLimit","pe"]},
+    rtax:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc",fields:["rtax"]},
+    efit:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc",fields:["efit"]},
+    cng:{classes:"pc w2 taxi pauto gauto lorry bus c4 misc",fields:["cng","cngFactoryFitted"]},
+    builtInCngEnabled:{classes:"pc w2 taxi pauto gauto lorry bus c4 misc",fields:["builtInCngEnabled"]},
+    emiProtectEnabled:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc",fields:["emiProtectEnabled","emi"]}
   };
   const vehicleRules={
     seats:"taxi etaxi pauto bus c4 ec4",
     gvw:"lorry", emp:"lorry", nfpp:"lorry",
     goodsCarrierType:"gauto",
     trailer:"misc", trailerIdv:"misc", trailerOdRate:"misc", trailerTP:"misc",
-    edu:"bus", imt:"taxi pauto gauto lorry bus misc",
+    edu:"bus", imt:"taxi etaxi pauto gauto lorry bus misc",
     ltcpa:"pc epc w2 e2w",
     paseats:"pc epc w2 e2w bus c4 ec4 gauto lorry misc",
     pasi:"pc epc w2 e2w"
@@ -7818,7 +7818,8 @@ body.sotp .cols > section[aria-label="Coverages"] { display:none !important; }
     document.querySelectorAll(".addon-pick[data-addon-target]").forEach(tile=>{
       const target=tile.dataset.addonTarget;
       const rule=addonRules[target];
-      const allowed=rule?classSet(rule.classes):classSet(tile.dataset.addonClasses);
+      /* v1.4.2: the tab's own data-addon-classes list is the single source of truth. */
+      const allowed=classSet(tile.dataset.addonClasses||(rule?rule.classes:""));
       const enabled=allowed.has(cls);
       hide(tile,!enabled);
       const pick=tile.querySelector("input");
