@@ -677,7 +677,7 @@ a{color:#087f83}
       <label for="wstampf" class="gate-upload" id="wupload" style="display:none">Upload PNG Logo</label>
       <input id="wstampf" type="file" accept="image/*" style="position:fixed;left:-9999px;width:1px;height:1px;opacity:0">
     </div>
-    <div class="gate-foot">All rights reserved - Kota Kishore Kumar</div>
+    <div class="gate-foot">All rights reserved - Kota Kishore Kumar<br><a href="https://kota112457.uii.ms" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Kota112457.uii.ms</a></div>
   </div>
 </section>
 
@@ -708,7 +708,7 @@ a{color:#087f83}
       </div>
       <button type="button" class="back-link" id="cback">&larr; Back</button>
     </div>
-    <div class="gate-foot">All rights reserved - Kota Kishore Kumar</div>
+    <div class="gate-foot">All rights reserved - Kota Kishore Kumar<br><a href="https://kota112457.uii.ms" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Kota112457.uii.ms</a></div>
   </div>
 </section>
 
@@ -738,7 +738,7 @@ a{color:#087f83}
       </div>
       <button type="button" class="back-link" id="lback">&larr; Back</button>
     </div>
-    <div class="gate-foot">All rights reserved - Kota Kishore Kumar</div>
+    <div class="gate-foot">All rights reserved - Kota Kishore Kumar<br><a href="https://kota112457.uii.ms" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Kota112457.uii.ms</a></div>
   </div>
 </section>
 
@@ -1003,7 +1003,7 @@ a{color:#087f83}
     <div class="status" id="status" role="status" aria-live="polite"></div>
   </div>
 </footer>
-<div class="rights" id="main-rights">All rights reserved - Kota Kishore Kumar</div>
+<div class="rights" id="main-rights">All rights reserved - Kota Kishore Kumar · <a href="https://kota112457.uii.ms" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Kota112457.uii.ms</a></div>
 </div>
 
 <!-- 5. QUOTATION PREVIEW SCREEN -->
@@ -1018,7 +1018,7 @@ a{color:#087f83}
   </div>
   <div class="status" id="pstatus" role="status" aria-live="polite"></div>
   <div class="sheetwrap"><div id="sheet"></div></div>
-  <div class="rights">All rights reserved - Kota Kishore Kumar</div>
+  <div class="rights">All rights reserved - Kota Kishore Kumar · <a href="https://kota112457.uii.ms" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">Kota112457.uii.ms</a></div>
 </div>
 
 </div>
@@ -1661,6 +1661,8 @@ function buildWhatsAppText(){
     lines.push("");
     lines.push("Prepared by: "+[q.by,q.byc].filter(Boolean).join(" | "));
   }
+  lines.push("");
+  lines.push("🌐 https://kota112457.uii.ms");
   return {text:lines.join("\n"), mobile:q.mobile};
 }
 function sendWhatsApp(){
@@ -1733,7 +1735,7 @@ function sheetHTML(q){
   <h3>Risk details</h3><table>${det}</table>
   <h3>Premium</h3><table>${prem}</table>
   <p class="words">${e(rupeesInWords(c.total))}</p>
-  <ul class="terms"><li>This quotation is indicative and based on the tariff rates supplied. Final premium is subject to the insurer's underwriting and acceptance of the proposal.</li><li>Premium is payable in advance of the commencement of cover.</li></ul>
+  <ul class="terms"><li>This quotation is indicative and based on the tariff rates supplied. Final premium is subject to the insurer's underwriting and acceptance of the proposal.</li><li>Premium is payable in advance of the commencement of cover.</li><li>Website: <a href="https://kota112457.uii.ms" target="_blank" rel="noopener">Kota112457.uii.ms</a></li></ul>
   <div class="sign"><div>Customer signature</div><div>Authorised signatory</div></div>
   </div>`;
 }
