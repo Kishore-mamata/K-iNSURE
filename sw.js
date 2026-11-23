@@ -7,6 +7,7 @@ const APP_FILES = [
   './',
   './index.html',
   './mobile.html',
+  './whats-new.html',
   './mobile.webmanifest',
   './manifest.webmanifest',
   './modules/motor.html',

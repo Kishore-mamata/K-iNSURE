@@ -184,6 +184,7 @@ h1,.panel h3{color:#17345d!important}
     <button data-page="Quotations" onclick="showPlaceholder('Quotations',this)"><span class="ico">▤</span><span class="txt">Quotations</span></button>
     <button data-page="Tariff & Rates" onclick="showPlaceholder('Tariff & Rates',this)"><span class="ico">▱</span><span class="txt">Tariff &amp; Rates</span></button>
     <button data-page="Settings" onclick="showPlaceholder('Settings',this)"><span class="ico">⚙</span><span class="txt">Settings</span></button>
+    <button data-page="Whats New" onclick="location.href='whats-new.html'"><span class="ico">★</span><span class="txt">What's new</span></button>
     <button data-page="Exit" onclick="exitApp(this)"><span class="ico">⏻</span><span class="txt">Exit</span></button>
   </nav>
   <div class="role-wrap sidebar-role"><button type="button" class="user" id="roleButton" aria-haspopup="true" aria-expanded="false" onclick="toggleRoleMenu()">● &nbsp; <span id="roleLabel">User</span> ▾</button><div id="roleMenu" class="role-menu" hidden><button type="button" onclick="selectRole('user')">USER</button><button type="button" onclick="selectRole('owner')">OWNER</button></div></div>
@@ -825,4 +826,89 @@ if('serviceWorker' in navigator && location.protocol.indexOf('http')===0){
   }
 })();
 </script>
+<!-- ===== K-iNSURE install button (v1.4.2) ===== -->
+<style id="kinsure-install-style">
+#kInstallBar{position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));z-index:5500;display:none;align-items:center;gap:10px;max-width:520px;margin:0 auto;background:#0f2747;color:#fff;border-radius:16px;padding:10px 10px 10px 14px;box-shadow:0 8px 28px rgba(0,0,0,.28);font:14px/1.35 "Segoe UI",Roboto,Arial,sans-serif}
+#kInstallBar.show{display:flex}
+#kInstallBar img{width:38px;height:38px;border-radius:10px;flex:none}
+#kInstallBar .tx{flex:1;min-width:0}
+#kInstallBar .tx b{display:block;font-size:15px}
+#kInstallBar .tx small{opacity:.8}
+#kInstallBtn{flex:none;border:0;border-radius:999px;background:#14a3a1;color:#fff;font-weight:700;font-size:14px;padding:10px 16px;cursor:pointer}
+#kInstallX{flex:none;border:0;background:transparent;color:#fff;opacity:.7;font-size:20px;line-height:1;padding:4px 6px;cursor:pointer}
+#kInstallHelp{position:fixed;inset:0;z-index:6100;display:none;align-items:flex-end;justify-content:center;background:rgba(10,20,40,.55);font:15px/1.5 "Segoe UI",Roboto,Arial,sans-serif}
+#kInstallHelp.show{display:flex}
+#kInstallHelp .sheet{background:#fff;color:#1c2533;width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 18px max(18px,env(safe-area-inset-bottom))}
+@media(min-width:700px){#kInstallHelp{align-items:center}#kInstallHelp .sheet{border-radius:18px}}
+#kInstallHelp h2{margin:0 0 8px;font-size:18px;color:#0f2747}
+#kInstallHelp ol{margin:8px 0 12px;padding-left:22px}
+#kInstallHelp li{margin:6px 0}
+#kInstallHelp .acts{display:flex;gap:8px;flex-wrap:wrap}
+#kInstallHelp button{border:0;border-radius:999px;padding:10px 16px;font-weight:700;font-size:14px;cursor:pointer}
+#kInstallHelp .p{background:#0e7c7b;color:#fff}
+#kInstallHelp .s{background:#eef3fa;color:#0f2747}
+#kInstallHelp .msg{font-size:13px;color:#1d7a3e;min-height:18px;margin-top:6px}
+</style>
+<div id="kInstallBar" role="region" aria-label="Install K-iNSURE">
+  <img src="icons/icon-192.png" alt="">
+  <div class="tx"><b>Install K-iNSURE app</b><small>Opens full screen · works offline</small></div>
+  <button type="button" id="kInstallBtn">Install</button>
+  <button type="button" id="kInstallX" aria-label="Close">×</button>
+</div>
+<div id="kInstallHelp" role="dialog" aria-modal="true" aria-labelledby="kInstallHelpT">
+  <div class="sheet">
+    <h2 id="kInstallHelpT">Install K-iNSURE</h2>
+    <div id="kInstallSteps"></div>
+    <div class="acts">
+      <button type="button" class="p" id="kInstallCopy">Copy app link</button>
+      <button type="button" class="s" id="kInstallClose">Close</button>
+    </div>
+    <div class="msg" id="kInstallMsg" role="status"></div>
+  </div>
+</div>
+<script id="kinsure-install-script">
+(function(){
+  var ua=navigator.userAgent||"";
+  var standalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;
+  if(standalone) return;                       /* already running as the installed app */
+  var bar=document.getElementById('kInstallBar'), help=document.getElementById('kInstallHelp');
+  var deferred=null;
+  var isIOS=/iPhone|iPad|iPod/i.test(ua)||(/Macintosh/.test(ua)&&'ontouchend' in document);
+  var inApp=/WhatsApp|FBAN|FBAV|Instagram|Line\/|Snapchat|Twitter|; wv\)/i.test(ua);
+  var isAndroid=/Android/i.test(ua);
+  var isMobile=isIOS||isAndroid||/Mobile/i.test(ua);
+  var appLink=location.origin+location.pathname.replace(/[^\/]*$/,'')+(isMobile?'mobile.html':'');
+  function show(){ try{ if(sessionStorage.getItem('kInstallHidden')==='1') return; }catch(e){} bar.classList.add('show'); }
+  function steps(){
+    if(inApp) return '<p>This link opened inside another app (such as WhatsApp), which can\'t install apps.</p><ol><li>Tap <b>⋮</b> (top right) and choose <b>Open in Chrome</b> (or <b>Open in browser</b>).'+(isIOS?' On iPhone, copy the link and open it in <b>Safari</b>.':'')+'</li><li>Then tap <b>Install</b> again.</li></ol>';
+    if(isIOS) return '<ol><li>Open this page in <b>Safari</b>.</li><li>Tap the <b>Share</b> button (square with an up-arrow).</li><li>Tap <b>Add to Home Screen</b>, then <b>Add</b>.</li></ol>';
+    if(isAndroid) return '<ol><li>Open this page in <b>Chrome</b>.</li><li>Tap <b>⋮</b> (three dots, top right).</li><li>Tap <b>Add to Home screen</b> or <b>Install app</b>, then <b>Install</b>.</li></ol>';
+    return '<ol><li>Open this page in <b>Chrome</b> or <b>Edge</b>.</li><li>Click the <b>Install</b> icon at the right end of the address bar.<br>Or: Chrome <b>⋮ → Cast, save and share → Install page as app</b>; Edge <b>⋯ → Apps → Install this site as an app</b>.</li><li>Click <b>Install</b>.</li></ol>';
+  }
+  function openHelp(){ document.getElementById('kInstallSteps').innerHTML=steps(); document.getElementById('kInstallMsg').textContent=''; help.classList.add('show'); }
+  window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; show(); });
+  window.addEventListener('appinstalled',function(){ bar.classList.remove('show'); help.classList.remove('show'); deferred=null; });
+  document.getElementById('kInstallBtn').addEventListener('click',function(){
+    if(deferred){ deferred.prompt(); deferred.userChoice.then(function(c){ if(c&&c.outcome==='accepted') bar.classList.remove('show'); deferred=null; }); }
+    else openHelp();
+  });
+  document.getElementById('kInstallX').addEventListener('click',function(){ bar.classList.remove('show'); try{sessionStorage.setItem('kInstallHidden','1');}catch(e){} });
+  document.getElementById('kInstallClose').addEventListener('click',function(){ help.classList.remove('show'); });
+  help.addEventListener('click',function(e){ if(e.target===help) help.classList.remove('show'); });
+  document.getElementById('kInstallCopy').addEventListener('click',function(){
+    var m=document.getElementById('kInstallMsg');
+    function done(){ m.textContent='Link copied: '+appLink; }
+    if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(appLink).then(done,function(){ m.textContent=appLink; });
+    else m.textContent=appLink;
+  });
+  /* Browsers that never offer the automatic prompt (iPhone, in-app browsers): show the bar with step-by-step help. */
+  if(isIOS||inApp) show();
+  else setTimeout(function(){ if(!deferred) show(); },4000);
+  /* Keep the bar out of the way once a calculator or menu page is opened. */
+  document.addEventListener('click',function(e){ if(e.target.closest&&e.target.closest('.m-card, nav button, .card, [onclick*="kmOpen"], [onclick*="openModule"]')) bar.classList.remove('show'); },true);
+  window.kInstallOpen=function(){ if(deferred) document.getElementById('kInstallBtn').click(); else openHelp(); };
+})();
+</script>
+<!-- ===== end install button ===== -->
+
 </body></html>
