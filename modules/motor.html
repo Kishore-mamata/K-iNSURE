@@ -3716,7 +3716,7 @@ function motorCalc(id,i,R){
   const tyreRimCarAge=(i.ageYears!==undefined&&i.ageYears!==null)?N(i.ageYears):null;
   const tyreRimCarEligibleClass=["pc","epc"].includes(id);
   // Match the UI eligibility: annual private-car package OR new private-car 3-year bundled package.
-  const tyreRimCarEligibleAnnual=tyreRimCarEligibleClass&&i.ptype==="comp"&&Number(i.term)===1;
+  const tyreRimCarEligibleAnnual=tyreRimCarEligibleClass&&(i.ptype==="comp"||i.ptype==="od")&&Number(i.term)===1; // v1.4.4: also Standalone OD
   const tyreRimCarEligibleLong=tyreRimCarEligibleClass&&i.ptype==="bundle"&&tyreRimCarAge!==null&&tyreRimCarAge>=0&&tyreRimCarAge<1&&Number(i.term)===3;
   const tyreRimCarProtectRate=tyreRimCarEligibleLong?(tyreRimCarLongRates[tyreRimCarCover]||0):(tyreRimCarEligibleAnnual?(tyreRimCarAnnualRates[tyreRimCarCover]||0):0);
   const tyreRimCarProtect=(od&&i.tyreRimCarProtectEnabled&&tyreRimCarProtectRate>0)?tyreRimCarProtectRate:0;
@@ -4111,7 +4111,8 @@ function motorImport(sheets,MO){
 //MI-END
 const $=id=>document.getElementById(id);
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const inr=(n,d=2)=>"₹ "+n.toLocaleString("en-IN",{minimumFractionDigits:d,maximumFractionDigits:d});
+// v1.4.4: all amounts shown in whole rupees (paise rounded off).
+const inr=(n,d=0)=>"₹ "+(d===0?Math.round(Number(n)||0):n).toLocaleString("en-IN",{minimumFractionDigits:d,maximumFractionDigits:d});
 const pad=n=>String(n).padStart(2,"0");
 const isoDate=d=>d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
 const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -4558,7 +4559,7 @@ function enforceCoverRules(){
   if(tyreRimBlocked&&tyreRimClass&&tyreRimAge!==null&&tyreRimAge>=5)msgs.push("Tyre and Rim Protect is not auto-rated for two-wheelers aged 5 years or older; the supplied schedule ends below 5 years.");
   const tyreRimCarClass=["pc","epc"].includes(cls);
   const tyreRimCarLong=$("ptype").value==="bundle"&&age!==null&&age>=0&&age<1&&Number($("term").value)===3;
-  const tyreRimCarAnnual=tyreRimCarClass&&$("ptype").value==="comp"&&Number($("term").value)===1;
+  const tyreRimCarAnnual=tyreRimCarClass&&($("ptype").value==="comp"||$("ptype").value==="od")&&Number($("term").value)===1;
   const tyreRimCarEligible=tyreRimCarAnnual||tyreRimCarLong;
   $("tyreRimCarProtectEnabled").disabled=!tyreRimCarEligible;
   if(!tyreRimCarEligible)$("tyreRimCarProtectEnabled").checked=false;
@@ -4568,7 +4569,7 @@ function enforceCoverRules(){
   const carLong={25000:2500,50000:5000,100000:10000,200000:20000}[carCover]||0;
   $("tyreRimCarProtectInfo").textContent=tyreRimCarEligible
     ? (tyreRimCarLong?"New private car, 3-year package schedule amount: ₹"+carLong.toLocaleString("en-IN")+" (excluding GST). The source table says ‘Annual Premium’; confirm if this is annual or total-term before quoting.":"One-year private-car package premium: ₹"+carAnnual.toLocaleString("en-IN")+" (excluding GST).")
-    : "Private-car Tyre and Rim Protector is enabled only for a one-year package policy or a new private car 3-year bundled package policy, subject to the supplied schedule.";
+    : "Private-car Tyre and Rim Protector is enabled only for a one-year package or Standalone OD policy, or a new private car 3-year bundled package policy, subject to the supplied schedule.";
   if($("tyreRimCarProtectEnabled").checked&&tyreRimCarLong)msgs.push("Tyre and Rim Protector 3-year rates are ambiguous: the schedule lists the amount under ‘Annual Premium’; confirm whether the amount is annual or for the full term.");
   const consumablesPrivateOrTwoWheeler=["pc","epc","w2","e2w"].includes(cls);
   const consumablesCommercial=["taxi","etaxi","pauto","gauto","lorry","bus","c4","ec4"].includes(cls);
@@ -4640,7 +4641,7 @@ function updateNilDepreciationStatus(i,r){
   else {
     good=true;
     const rate=Number(i.nd||0)||suggestedNdRate(age);
-    if(i.ndEnabled&&r&&r.nd>0) message="Nil Depreciation calculated: "+rate.toFixed(0)+"% × ₹"+Number(r.ndBase||0).toLocaleString("en-IN",{maximumFractionDigits:2})+" = ₹"+Number(r.nd).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})+" before GST.";
+    if(i.ndEnabled&&r&&r.nd>0) message="Nil Depreciation calculated: "+rate.toFixed(0)+"% × ₹"+Math.round(Number(r.ndBase||0)).toLocaleString("en-IN")+" = ₹"+Number(r.nd).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})+" before GST.";
     else if(nilDepreciationNeedsImt23()&&!$("imt").checked)message="IMT-23 is required for Nil Depreciation on this commercial vehicle.";
     else if(rate>0) message="Eligible for Nil Depreciation based on vehicle age and class. Suggested rate: "+rate.toFixed(0)+"% of Basic Own Damage premium before tariff discount"+". Use the Nil Depreciation button to apply it.";
     else message="No applicable Nil Depreciation rate was found for this vehicle age.";
@@ -5826,7 +5827,7 @@ freshDate();setClass("pc",false);applyClassSpecificVisibility();renderSaved();
     }
     if(target==='tyreRimCarProtectEnabled'){
       const age=window.actualAgeYears?window.actualAgeYears():null;
-      return ['pc','epc'].includes(cls)&&((ptype==='comp'&&Number(byId('term')?.value)===1)||(ptype==='bundle'&&age!==null&&age>=0&&age<1&&Number(byId('term')?.value)===3));
+      return ['pc','epc'].includes(cls)&&(((ptype==='comp'||ptype==='od')&&Number(byId('term')?.value)===1)||(ptype==='bundle'&&age!==null&&age>=0&&age<1&&Number(byId('term')?.value)===3));
     }
     if(target==='ncbProtectEnabled')return ['pc','epc'].includes(cls)||(cls==='taxi'&&Number(byId('seats')?.value||4)<=6);
     if(target==='keyProtectEnabled')return ['pc','epc','taxi','w2','e2w'].includes(cls);
@@ -8301,7 +8302,7 @@ body.ka #main#main .slip #motorActionFooter .acts{display:grid!important;grid-te
   try{var l=document.createElement('link');l.rel='stylesheet';l.href='https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap';document.head.appendChild(l);}catch(e){}
   var COLORS={od:'#5FC4C6',add:'#F2C46D',lia:'#9DB4F0',gst:'#6F84A0'};
   function num(el){if(!el)return 0;var v=parseFloat(String(el.textContent).replace(/[^0-9.\-]/g,''));return isFinite(v)?v:0;}
-  function inr(n){return '₹'+n.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function inr(n){return '₹'+Math.round(Number(n)||0).toLocaleString('en-IN',{minimumFractionDigits:0,maximumFractionDigits:0});}
   function build(){
     var slip=document.querySelector('#main .cols > section.slip'),total=slip&&slip.querySelector('.total');
     if(!slip||!total)return false;

@@ -1246,7 +1246,7 @@ function fireCalc(si,rate,disc,tr,gst,load){
   load=load||0;
   const prem=si*rate/1000, dis=prem*disc/100, ld=prem*load/100, dprem=prem-dis+ld, trp=si*tr/1000;
   const net=dprem+trp, g=net*gst/100;
-  return {prem,dis,ld,dprem,trp,net,g,total:net+g};
+  return {prem,dis,ld,dprem,trp,net,g,total:Math.round(net+g)}; // v1.4.4: total in whole rupees
 }
 function bgrCalc(cover,si,years,rate,disc,addRate,uplift,gst,stamp){
   const contents=cover==="cont"?Math.min(si*Math.max(0,uplift)/100,1000000):0;
@@ -1254,13 +1254,14 @@ function bgrCalc(cover,si,years,rate,disc,addRate,uplift,gst,stamp){
   const prem=s*rate/1000*years, dtd=prem-prem*disc/100;
   const addon=cover==="uv"?0:s*addRate/1000*years;
   const net=dtd+addon, g=net*gst/100;
-  return {s,contents,prem,dtd,addon,net,g,stamp,total:net+g+stamp};
+  return {s,contents,prem,dtd,addon,net,g,stamp,total:Math.round(net+g+stamp)}; // v1.4.4: total in whole rupees
 }
 //PURE-END
 
 let tab="fire", fireVariant="standard";
 let sel=DATA.find(r=>r[0]===1007)||DATA[0], zone=1, bgrZone=1, shown=[], cover="bgr";
-const inr=(n,d=2)=>"₹ "+n.toLocaleString("en-IN",{minimumFractionDigits:d,maximumFractionDigits:d});
+// v1.4.4: all amounts shown in whole rupees (paise rounded off).
+const inr=(n,d=0)=>"₹ "+(d===0?Math.round(Number(n)||0):n).toLocaleString("en-IN",{minimumFractionDigits:d,maximumFractionDigits:d});
 function words(n){ if(!(n>0))return ""; const cr=n/1e7,l=n/1e5;
   if(cr>=1)return "= ₹ "+(+cr.toFixed(2))+" crore"; if(l>=1)return "= ₹ "+(+l.toFixed(2))+" lakh"; return ""; }
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
@@ -1783,7 +1784,7 @@ async function doSave(asNew){
   const q=collect();
   if(!q.name){say("Enter the customer name to save the quotation.",true);$("cn").focus();return;}
   const f=figures(q), now=Date.now(), keep=!asNew&&currentId;
-  const doc={...q,total:Math.round(f.total*100)/100,createdAt:keep&&currentCreated?currentCreated:now,updatedAt:now};
+  const doc={...q,total:Math.round(f.total),createdAt:keep&&currentCreated?currentCreated:now,updatedAt:now};
   try{
     const id=await store.save(keep?currentId:null,doc);
     currentId=id;currentCreated=doc.createdAt;$("bnew").hidden=false;
