@@ -3761,7 +3761,7 @@ function motorCalc(id,i,R){
   const effectiveNcb=(renewalDate&&renewalDays<=90&&!(i.purchaseDate&&renewalDate<i.purchaseDate))?ncb:0;
   // NCB on OD after tariff discount, including IMT-23 and Nil Depreciation premium,
   // matching the insurer reference quotation (v1.4.2 fix).
-  const ncbBase=afterDisc+imt+nd, ncbAmt=ncbBase*effectiveNcb/100, sub=afterDisc+imt+nd, netOD=sub-ncbAmt+ncbProtect+evProtect;
+  let ncbBase=afterDisc+imt+nd, ncbAmt=ncbBase*effectiveNcb/100, sub=afterDisc+imt+nd, netOD=sub-ncbAmt+ncbProtect+evProtect;
   let act=0,seatTP=0;
   if(tpOn){
     act=c.actFlat!==undefined?N(c.actFlat):(id==="lorry"?lorryAct(gvw,c.actBands):N((c.act||[])[dimIdx]));
@@ -3798,9 +3798,14 @@ function motorCalc(id,i,R){
   const evOnlyClass=["epc","e2w","etaxi","ec4"].includes(id);
   const builtInCngLpg=!evOnlyClass&&(!!i.addonActive?.builtInCngEnabled || /cng|lpg/i.test(fuel));
   const cngKit=evOnlyClass?0:Math.max(0,N(i.cng));
-  // Built in CNG/LPG fuel: 2% of basic OD across all vehicle classes,
-  // plus a fixed ₹60 third-party liability premium.
-  const builtInCngOD=(od&&builtInCngLpg)?basic*ADDON_RATES.cngBuiltInOD/100:0;
+  // Built in CNG/LPG fuel (v1.4.4, matches UIIC commercial worksheet):
+  // Private car / two-wheeler: 2% of Basic OD before discount;
+  // Commercial classes: 5% of OD after tariff discount.
+  // Plus a fixed ₹60 third-party liability premium.
+  const builtInCngCommercial=!["pc","epc","w2","e2w"].includes(id);
+  const builtInCngRate=builtInCngCommercial?Number(ADDON_RATES.cngBuiltInODCommercial):Number(ADDON_RATES.cngBuiltInOD);
+  const builtInCngBase=builtInCngCommercial?afterDisc:basic;
+  const builtInCngOD=(od&&builtInCngLpg)?builtInCngBase*builtInCngRate/100:0;
   // A separately declared CNG/LPG kit may also be fitted to a Petrol/Diesel vehicle.
   // Preserve its existing kit-value OD rating; charge the ₹60 TP liability only once.
   const cng=(tpOn&&(builtInCngLpg||cngKit>0))?ADDON_RATES.cngTP:0;
@@ -3821,6 +3826,9 @@ function motorCalc(id,i,R){
   const rtiSchedule=id==="gauto"?(String(i.goodsCarrierType||"public")==="private"?rtiRates.gautoPrivate:rtiRates.gautoPublic):(rtiRates[id]||(id==="etaxi"?rtiRates.taxi:null));
   const rtiRate=(rtiBand>=0&&rtiSchedule)?rtiSchedule[rtiBand]:0;
   const rtiPremium=(od&&i.addonActive?.rti&&rtiRate>0&&idv>0)?idv*rtiRate/100:0;
+  // v1.4.4: NCB also applies to Return to Invoice premium (matches insurer quotation).
+  const ncbOnRti=rtiPremium*effectiveNcb/100;
+  ncbBase+=rtiPremium; ncbAmt+=ncbOnRti; netOD-=ncbOnRti;
   const man={};let manSum=0;
   ["engp","enggear"].forEach(k=>{man[k]=(od&&i.addonActive?.[k])?Math.max(0,N(i[k])):0;manSum+=man[k];});
   man.rsa=(od&&i.addonActive?.rsa)?ADDON_RATES.rsa:0; manSum+=man.rsa;
@@ -3849,8 +3857,9 @@ function motorCalc(id,i,R){
     gOD=Math.round(fullTaxBase*(gst/2)/100);
     gTP=Math.round(fullTaxBase*(gst/2)/100);
   } else if(c.split){
-    gOD=Math.round((netOD+extras+pa+ltpa+ll+emp+nfpp+cng)*gst/100);
-    gTP=Math.round(act*gstt/100);
+    // v1.4.4: Built-in CNG/LPG TP loading is taxed with Basic TP (5%), as in the UIIC worksheet.
+    gOD=Math.round((netOD+extras+pa+ltpa+ll+emp+nfpp)*gst/100);
+    gTP=Math.round((act+cng)*gstt/100);
   } else {
     gOD=(netOD+extras+liability)*gst/100;
   }
@@ -3859,7 +3868,7 @@ function motorCalc(id,i,R){
     ? roundedNetPremium+gOD+gTP
     : Math.round(netOD+extras+liability+gOD+gTP);
   if(!Number.isFinite(total)) throw new Error("Premium could not be calculated. Check the selected vehicle category and rate table.");
-  return {ndBase,ndGross,ndRenewalDiscount,ndClaimFreeEligible,basic,builtInCngLpg,builtInCngOD,fixed,rate,gvwLoad,gross,discAmt,afterDisc,imt,nd,odLoad,odLoadBase,rtiMonths,rtiBand,rtiRate,rtiPremium,enginePlatinumRate,enginePlatinum,enginePlatinumBand,ncbBase,ncbProtectRate,ncbProtect,evProtectRate,evProtect,emiProtectRate,emiProtect,keyProtectRate,keyProtect,keyProtectEligible,personalBelongingsRate,personalBelongings,platinumPASi,platinumPASeats,platinumPATerm,platinumPABase,platinumPA,tyreRimProtectRate,tyreRimProtect,tyreRimCarCover,tyreRimCarProtectRate,tyreRimCarProtect,tyreRimCarEligibleLong,consumablesProtectRate,consumablesProtect,consumablesLongTerm,ncbAmt,netOD,act,seatTP,pa,ltpa,ll,emp,nfpp,cng,cngOD,trailerOD,trailerTP,efit,rtc,man,extras,liability,gOD,gTP,total,split:!!c.split||id==="pc"};
+  return {ndBase,ndGross,ndRenewalDiscount,ndClaimFreeEligible,basic,builtInCngLpg,builtInCngOD,builtInCngRate,builtInCngCommercial,fixed,rate,gvwLoad,gross,discAmt,afterDisc,imt,nd,odLoad,odLoadBase,rtiMonths,rtiBand,rtiRate,rtiPremium,enginePlatinumRate,enginePlatinum,enginePlatinumBand,ncbBase,ncbProtectRate,ncbProtect,evProtectRate,evProtect,emiProtectRate,emiProtect,keyProtectRate,keyProtect,keyProtectEligible,personalBelongingsRate,personalBelongings,platinumPASi,platinumPASeats,platinumPATerm,platinumPABase,platinumPA,tyreRimProtectRate,tyreRimProtect,tyreRimCarCover,tyreRimCarProtectRate,tyreRimCarProtect,tyreRimCarEligibleLong,consumablesProtectRate,consumablesProtect,consumablesLongTerm,ncbAmt,netOD,act,seatTP,pa,ltpa,ll,emp,nfpp,cng,cngOD,trailerOD,trailerTP,efit,rtc,man,extras,liability,gOD,gTP,total,split:!!c.split||id==="pc"};
 }
 //ENGINE-END
 //READERS-START
@@ -4144,7 +4153,7 @@ const ADDON_DEFAULTS={
   enginePlatinumPrivateCar:[0.13,0.16,0.21,0.27,0.32],
   enginePlatinumPassengerCommercial:[0.15,0.20,0.26,0,0],
   rsa:50,towing:75,medical50000:250,medical100000:325,personalEffects5000Fixed:250,personalEffects10000Fixed:500,
-  cngBuiltInOD:2,cngKitOD:4,cngTP:60,electricalFittings:4,roadTax:1.67,imt23Loading:15,
+  cngBuiltInOD:2,cngBuiltInODCommercial:5,cngKitOD:4,cngTP:60,electricalFittings:4,roadTax:1.67,imt23Loading:15,
   cpaOwnerDriver:{1:325,3:839,5:1316},legalLiabilityDriver:50,ltpa:1300,employeeLiabilityPerPerson:50,nfppPerPerson:75
 };
 const ADDON_RATES=(()=>{let v=JSON.parse(lsGet("mc_addon_rates")||"null");return v&&typeof v==="object"?mergeAddon(ADDON_DEFAULTS,v):JSON.parse(JSON.stringify(ADDON_DEFAULTS));})();
@@ -4244,7 +4253,7 @@ function lines(id,i,r){
   if(r.ncbAmt>0)od.push(["No claim bonus "+pct(i.ncb)+"%","− "+inr(r.ncbAmt)]);
   od.push(["Net own damage",inr(r.netOD),"strong"]);
   if(r.efit>0)od.push(["Electrical fittings (4%)","+ "+inr(r.efit)]);
-  if(r.builtInCngOD>0)od.push(["Built in CNG/LPG premium (2% of Basic Own Damage before discount)","+ "+inr(r.builtInCngOD)]);
+  if(r.builtInCngOD>0)od.push(["Built in CNG/LPG premium ("+(+Number(r.builtInCngRate).toFixed(3))+"% of "+(r.builtInCngCommercial?"Own Damage after discount":"Basic Own Damage before discount")+")","+ "+inr(r.builtInCngOD)]);
   if(r.cngOD>0)od.push(["Separately declared CNG / LPG kit OD premium (4% of kit value)","+ "+inr(r.cngOD)]);
   if(r.trailerOD>0)od.push(["Trailer own-damage premium","+ "+inr(r.trailerOD)]);
   if(r.rtc>0)od.push(["Road tax cover (1.67%)","+ "+inr(r.rtc)]);
@@ -4349,6 +4358,10 @@ function applyPtype(){
     discountSection.setAttribute("aria-disabled",String(tp));
   }
   document.body.classList.toggle("sotp",tp);
+  // v1.4.4: with Third Party Only, keep the Coverages column for CNG/LPG options
+  // (fixed ₹60 TP liability). Hide it only for vehicles that cannot have CNG/LPG.
+  const tpCngPossible=["pc","w2","taxi","pauto","gauto","lorry","bus","c4","misc"].includes(cls)&&$("fuel").value!=="Electric";
+  document.body.classList.toggle("sotp-nocng",tp&&!tpCngPossible);
   document.body.classList.toggle("saod",o);$("seatbox").classList.toggle("tp",cls!=="bus");
   // Electric private cars and electric two-wheelers support the supplied
   // 1-year and 3-year Third Party tariff terms.
@@ -4741,7 +4754,7 @@ function calc(){
     ["NCB Protect",r.ncbProtect],
     ["Electric Vehicle Protect",r.evProtect],
     ["Electrical fittings",r.efit],
-    ["Built in CNG/LPG — Own Damage (2% of Basic OD before discount)",r.builtInCngOD],
+    ["Built in CNG/LPG — Own Damage ("+(+Number(r.builtInCngRate).toFixed(3))+"% of "+(r.builtInCngCommercial?"OD after discount":"Basic OD before discount")+")",r.builtInCngOD],
     ["CNG / LPG kit — Own Damage",r.cngOD],
     ["Trailer — Own Damage",r.trailerOD],
     ["Road Tax Cover",r.rtc],
@@ -5092,15 +5105,15 @@ const ADDON_CLASS_RATES={
   epc:["nilDepPrivate","rti.epc","consumablesPrivate","consumablesLongPrivate","evPrivateElectric","ncbProtectPrivateCar","emiPrivateCar","key10","key25","keyLongPrivate10","keyLongPrivate25","personalEffects5000","personalEffects10000","platinumPA","tyreRimCarAnnual","tyreRimCarLong","enginePlatinumPrivateCar","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInOD","cngKitOD","cngTP","imt23Loading"],
   w2:["nilDepPrivate","rti.w2","consumablesPrivate","consumablesLongCommercial","evTwoWheeler","emiTwoWheeler","key10","key25","keyLongTwoWheeler","personalEffects5000","personalEffects10000","platinumPA","tyreRimTwoWheeler","enginePlatinumTwoWheeler","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInOD","cngKitOD","cngTP","imt23Loading"],
   e2w:["nilDepPrivate","rti.e2w","consumablesPrivate","consumablesLongCommercial","evTwoWheeler","emiTwoWheeler","key10","key25","keyLongTwoWheeler","personalEffects5000","personalEffects10000","platinumPA","tyreRimTwoWheeler","enginePlatinumTwoWheeler","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInOD","cngKitOD","cngTP","imt23Loading"],
-  taxi:["nilDepCommercial","rti.taxi","consumablesCommercial","consumablesLongCommercial","evCommercial","ncbProtectTaxi","emiTaxi","key10","key25","personalEffects5000","personalEffects10000","platinumPA","enginePlatinumPassengerCommercial","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInOD","cngKitOD","cngTP","imt23Loading"],
-  etaxi:["nilDepCommercial","rti.taxi","consumablesCommercial","consumablesLongCommercial","evCommercial","ncbProtectTaxi","emiTaxi","key10","key25","personalEffects5000","personalEffects10000","platinumPA","enginePlatinumPassengerCommercial","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInOD","cngKitOD","cngTP","imt23Loading","cpaOwnerDriver","legalLiabilityDriver","employeeLiabilityPerPerson"],
-  pauto:["nilDepCommercial","rti.pauto","consumablesCommercial","consumablesLongCommercial","evCommercial","emiCommercial","platinumPA","enginePlatinumPassengerCommercial","personalEffects5000","personalEffects10000","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInOD","cngKitOD","cngTP","imt23Loading"],
-  gauto:["nilDepCommercial","rti.gautoPublic","rti.gautoPrivate","consumablesCommercial","consumablesLongCommercial","evCommercial","emiCommercial","personalEffects5000","personalEffects10000","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInOD","cngKitOD","cngTP","imt23Loading","cpaOwnerDriver","legalLiabilityDriver","employeeLiabilityPerPerson","nfppPerPerson","platinumPA"],
-  lorry:["nilDepCommercial","rti.lorry","consumablesCommercial","consumablesLongCommercial","evCommercial","emiCommercial","personalEffects5000","personalEffects10000","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInOD","cngKitOD","cngTP","imt23Loading","platinumPA"],
-  bus:["nilDepCommercial","rti.bus","consumablesCommercial","consumablesLongCommercial","evCommercial","emiCommercial","personalEffects5000","personalEffects10000","platinumPA","enginePlatinumPassengerCommercial","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInOD","cngKitOD","cngTP","imt23Loading"],
-  c4:["nilDepCommercial","rti.c4","consumablesCommercial","consumablesLongCommercial","evCommercial","emiCommercial","personalEffects5000","personalEffects10000","tyreRimTwoWheeler","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInOD","cngKitOD","cngTP","imt23Loading","platinumPA"],
-  ec4:["nilDepCommercial","rti.ec4","consumablesCommercial","consumablesLongCommercial","evCommercial","emiCommercial","personalEffects5000","personalEffects10000","tyreRimTwoWheeler","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInOD","cngKitOD","cngTP","imt23Loading","platinumPA"],
-  misc:["nilDepCommercial","rti.misc","platinumPA","personalEffects5000","personalEffects10000","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInOD","cngKitOD","cngTP"]
+  taxi:["nilDepCommercial","rti.taxi","consumablesCommercial","consumablesLongCommercial","evCommercial","ncbProtectTaxi","emiTaxi","key10","key25","personalEffects5000","personalEffects10000","platinumPA","enginePlatinumPassengerCommercial","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInODCommercial","cngKitOD","cngTP","imt23Loading"],
+  etaxi:["nilDepCommercial","rti.taxi","consumablesCommercial","consumablesLongCommercial","evCommercial","ncbProtectTaxi","emiTaxi","key10","key25","personalEffects5000","personalEffects10000","platinumPA","enginePlatinumPassengerCommercial","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInODCommercial","cngKitOD","cngTP","imt23Loading","cpaOwnerDriver","legalLiabilityDriver","employeeLiabilityPerPerson"],
+  pauto:["nilDepCommercial","rti.pauto","consumablesCommercial","consumablesLongCommercial","evCommercial","emiCommercial","platinumPA","enginePlatinumPassengerCommercial","personalEffects5000","personalEffects10000","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInODCommercial","cngKitOD","cngTP","imt23Loading"],
+  gauto:["nilDepCommercial","rti.gautoPublic","rti.gautoPrivate","consumablesCommercial","consumablesLongCommercial","evCommercial","emiCommercial","personalEffects5000","personalEffects10000","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInODCommercial","cngKitOD","cngTP","imt23Loading","cpaOwnerDriver","legalLiabilityDriver","employeeLiabilityPerPerson","nfppPerPerson","platinumPA"],
+  lorry:["nilDepCommercial","rti.lorry","consumablesCommercial","consumablesLongCommercial","evCommercial","emiCommercial","personalEffects5000","personalEffects10000","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInODCommercial","cngKitOD","cngTP","imt23Loading","platinumPA"],
+  bus:["nilDepCommercial","rti.bus","consumablesCommercial","consumablesLongCommercial","evCommercial","emiCommercial","personalEffects5000","personalEffects10000","platinumPA","enginePlatinumPassengerCommercial","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInODCommercial","cngKitOD","cngTP","imt23Loading"],
+  c4:["nilDepCommercial","rti.c4","consumablesCommercial","consumablesLongCommercial","evCommercial","emiCommercial","personalEffects5000","personalEffects10000","tyreRimTwoWheeler","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInODCommercial","cngKitOD","cngTP","imt23Loading","platinumPA"],
+  ec4:["nilDepCommercial","rti.ec4","consumablesCommercial","consumablesLongCommercial","evCommercial","emiCommercial","personalEffects5000","personalEffects10000","tyreRimTwoWheeler","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInODCommercial","cngKitOD","cngTP","imt23Loading","platinumPA"],
+  misc:["nilDepCommercial","rti.misc","platinumPA","personalEffects5000","personalEffects10000","rsa","towing","medical50000","medical100000","personalEffects5000Fixed","personalEffects10000Fixed","electricalFittings","roadTax","cngBuiltInODCommercial","cngKitOD","cngTP"]
 };
 function addonValueAt(path){return path.split(".").reduce((o,k)=>o&&o[k],ADDON_RATES);}
 /* v1.4.2: show only ratings for add-ons that apply to the selected vehicle class. */
@@ -5117,7 +5130,7 @@ function addonRateApplies(path,k){
     enginePlatinumTwoWheeler:"enginePlatinumEnabled",enginePlatinumPrivateCar:"enginePlatinumEnabled",enginePlatinumPassengerCommercial:"enginePlatinumEnabled",
     platinumPA:"platinumPAEnabled",rsa:"rsa",towing:"tow",medical50000:"med",medical100000:"med",
     personalEffects5000Fixed:"pe",personalEffects10000Fixed:"pe",electricalFittings:"efit",roadTax:"rtax",
-    cngBuiltInOD:"builtInCngEnabled",cngKitOD:"cng",cngTP:"cng"};
+    cngBuiltInOD:"builtInCngEnabled",cngBuiltInODCommercial:"builtInCngEnabled",cngKitOD:"cng",cngTP:"cng"};
   const t=tabFor[root];
   if(t){const l=document.querySelector('.addon-pick[data-addon-target="'+t+'"]');
     if(l&&!String(l.dataset.addonClasses||"").split(/\s+/).includes(k))return false;}
@@ -5127,7 +5140,7 @@ function addonRateApplies(path,k){
   if(root==="evTwoWheeler")return k==="e2w";
   if(root==="consumablesLongPrivate"||root==="keyLongPrivate10"||root==="keyLongPrivate25")return ["pc","epc"].includes(k);
   if(root==="consumablesLongCommercial"||root==="keyLongTwoWheeler")return ["w2","e2w"].includes(k);
-  if(["cngBuiltInOD","cngKitOD","cngTP"].includes(root))return !["epc","e2w","etaxi","ec4"].includes(k);
+  if(["cngBuiltInOD","cngBuiltInODCommercial","cngKitOD","cngTP"].includes(root))return !["epc","e2w","etaxi","ec4"].includes(k);
   return true;
 }
 function renderAddonRates(){
@@ -5184,6 +5197,7 @@ function renderAddonRates(){
     "electricalFittings":"Electrical fittings (% of value)",
     "roadTax":"Road Tax Cover (% of value)",
     "cngBuiltInOD":"Built-in CNG/LPG Own Damage (% of Basic OD)",
+    "cngBuiltInODCommercial":"Built-in CNG/LPG Own Damage — commercial (% of OD after discount)",
     "cngKitOD":"Declared CNG/LPG kit Own Damage (% of kit value)",
     "cngTP":"CNG/LPG Third Party fixed premium",
     "imt23Loading":"IMT-23 loading (%)",
@@ -5604,7 +5618,7 @@ function sheetHTML(q){
     }
     if(/^Built in CNG\/LPG premium\b/i.test(x)) {
       m=x.match(/(\d+(?:\.\d+)?\s*%)/);
-      return `Built in CNG/LPG premium${m?` (${m[1].replace(/\s/g,"")} of Basic Own Damage)`:""}`;
+      return `Built in CNG/LPG premium${m?` (${m[1].replace(/\s/g,"")} of ${/after discount/i.test(x)?"OD after discount":"Basic Own Damage"})`:""}`;
     }
     if(/^(CGST|SGST)\b/i.test(x)) {
       m=x.match(/\((\d+(?:\.\d+)?\s*%)/);
@@ -5783,8 +5797,11 @@ freshDate();setClass("pc",false);applyClassSpecificVisibility();renderSaved();
     const classes=(p.dataset.addonClasses||"").split(/\s+/);
     const cls=byId('vc')?.value||'pc';
     const ptype=byId('ptype')?.value||'comp';
-    if(!classes.includes(cls)||ptype==='tp')return false;
     const target=p.dataset.addonTarget;
+    // v1.4.4: CNG/LPG options stay available with Third Party Only so the
+    // fixed CNG/LPG TP liability (₹60) can be charged. Other add-ons stay OD-only.
+    const tpAllowed=target==='cng'||target==='builtInCngEnabled';
+    if(!classes.includes(cls)||(ptype==='tp'&&!tpAllowed))return false;
     if(target==='rti'){
       const months=window.actualAgeMonths?window.actualAgeMonths():null;
       return months!==null&&months>=0&&months<=30;
@@ -5938,7 +5955,8 @@ freshDate();setClass("pc",false);applyClassSpecificVisibility();renderSaved();
       unit.appendChild(tile);
       unit.appendChild(panel);
       const update=()=>{
-        const active=pick.checked&&!pick.disabled&&$('ptype')?.value!=='tp';
+        const tpOk=cfg.pick==='cng'||cfg.pick==='builtInCngEnabled';
+        const active=pick.checked&&!pick.disabled&&($('ptype')?.value!=='tp'||tpOk);
         panel.hidden=!active;
         panel.querySelectorAll('select,input').forEach(el=>{el.disabled=!active;});
       };
@@ -5956,7 +5974,7 @@ freshDate();setClass("pc",false);applyClassSpecificVisibility();renderSaved();
       const pick=$('addonPick_'+cfg.pick);
       const panel=pick?.closest('.addon-pick')?.nextElementSibling;
       if(panel?.classList.contains('addon-subtab-panel')){
-        panel.hidden=!(pick.checked&&!pick.disabled&&$('ptype')?.value!=='tp');
+        panel.hidden=!(pick.checked&&!pick.disabled&&($('ptype')?.value!=='tp'||cfg.pick==='cng'||cfg.pick==='builtInCngEnabled'));
       }
     });
   });
@@ -7683,20 +7701,24 @@ html body footer.foot .fl * {
 
 
 <style id="hide-coverages-column-for-third-party-only">
+/* v1.4.4: Third Party Only shows only the CNG/LPG options in Coverages. */
+body.sotp #kAddonGrid#kAddonGrid#kAddonGrid#kAddonGrid > .addon-pick:not([data-addon-target="cng"]):not([data-addon-target="builtInCngEnabled"]),
+body.sotp #kAddonGrid#kAddonGrid#kAddonGrid#kAddonGrid > .tiny-addon-unit:not(:has(> .addon-pick[data-addon-target="cng"], > .addon-pick[data-addon-target="builtInCngEnabled"])) { display:none !important; }
+body.sotp #kAddonGrid#kAddonGrid#kAddonGrid#kAddonGrid > .addon-group-title:not(:has(+ .tiny-addon-unit > .addon-pick[data-addon-target="efit"])) { display:none !important; }
 /* Third Party Only: hide the entire Column 2 (Coverages). Restore it for all other policy types. */
-body.sotp .cols > section[aria-label="Coverages"] { display:none !important; }
+body.sotp.sotp-nocng .cols > section[aria-label="Coverages"] { display:none !important; }
 @media (min-width:1121px) {
-  body.sotp .cols { grid-template-columns:minmax(250px,1fr) minmax(290px,.95fr) !important; }
-  body.sotp .cols > section[aria-label="Vehicle and cover"] { grid-column:1 !important; }
-  body.sotp .cols > section[aria-label="Premium"] { grid-column:2 !important; }
+  body.sotp.sotp-nocng .cols { grid-template-columns:minmax(250px,1fr) minmax(290px,.95fr) !important; }
+  body.sotp.sotp-nocng .cols > section[aria-label="Vehicle and cover"] { grid-column:1 !important; }
+  body.sotp.sotp-nocng .cols > section[aria-label="Premium"] { grid-column:2 !important; }
 }
 @media (max-width:1120px) {
-  body.sotp .cols { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
-  body.sotp .cols > section[aria-label="Premium"] { grid-column:1/-1 !important; }
+  body.sotp.sotp-nocng .cols { grid-template-columns:repeat(2,minmax(0,1fr)) !important; }
+  body.sotp.sotp-nocng .cols > section[aria-label="Premium"] { grid-column:1/-1 !important; }
 }
 @media (max-width:700px) {
-  body.sotp .cols { grid-template-columns:minmax(0,1fr) !important; }
-  body.sotp .cols > section[aria-label="Premium"] { grid-column:1 !important; }
+  body.sotp.sotp-nocng .cols { grid-template-columns:minmax(0,1fr) !important; }
+  body.sotp.sotp-nocng .cols > section[aria-label="Premium"] { grid-column:1 !important; }
 }
 </style>
 
