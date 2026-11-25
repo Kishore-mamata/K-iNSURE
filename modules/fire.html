@@ -174,10 +174,18 @@ input:focus-visible,select:focus-visible,button:focus-visible,.opt:focus-visible
 .subtab{flex:1;border:1px solid var(--line);border-radius:8px;background:var(--field);color:var(--fg);padding:8px 10px;font:600 13px var(--font-body);cursor:pointer}
 .subtab[aria-pressed="true"]{background:var(--navy);color:var(--navy-fg);border-color:var(--navy)}
 
-/* Conditions Tab Screen */
-.cond-box{max-width:520px;margin:24px auto;text-align:center;padding:28px 22px;gap:14px;align-items:center}
-.cond-msg{font:800 1.25rem/1.3 var(--font-head);color:var(--err);margin:6px 0}
-.cond-acts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+/* v1.4.5: "Permission Denied" pop-up (replaces the Conditions screen) */
+.perm-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(16,24,58,.55);backdrop-filter:blur(2px);animation:permFade .15s ease-out}
+.perm-overlay[hidden]{display:none!important}
+.perm-box{width:100%;max-width:400px;background:var(--surface);color:var(--fg);border-radius:16px;border-top:6px solid var(--err);box-shadow:0 18px 50px rgba(16,24,58,.35);padding:26px 22px 20px;text-align:center;animation:permPop .18s ease-out}
+.perm-ico{width:62px;height:62px;margin:0 auto 10px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;background:#fde8e6;border:2px solid var(--err)}
+.perm-box h2{display:block;width:100%;text-align:center;justify-content:center;margin:0 0 6px;font:800 1.4rem/1.2 var(--font-head);color:var(--err)}
+.cond-msg{font:700 1.02rem/1.35 var(--font-head);color:var(--fg);margin:4px 0}
+.perm-sub{margin:4px 0 0;font-size:.88rem;color:var(--muted)}
+.cond-acts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+.cond-acts .btn{min-width:130px}
+@keyframes permFade{from{opacity:0}to{opacity:1}}
+@keyframes permPop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
 
 .slip{padding:0;gap:0;overflow:hidden}
 .slip .total{background:var(--navy);color:var(--navy-fg);padding:12px 14px 14px}
@@ -762,13 +770,17 @@ a{color:#087f83}
 </header>
 
 <!-- CONDITIONS TAB PANEL (Displayed alone when someone tries to modify a rate) -->
-<section id="p-conditions" class="card cond-box" role="tabpanel" aria-labelledby="t-cond" hidden>
-  <h2>Conditions</h2>
-  <div class="cond-msg">Others cannot modify.</div>
+<section id="p-conditions" class="perm-overlay" role="alertdialog" aria-modal="true" aria-labelledby="perm-title" aria-describedby="perm-msg" hidden>
+ <div class="perm-box">
+  <div class="perm-ico" aria-hidden="true">🔒</div>
+  <h2 id="perm-title">Permission Denied</h2>
+  <div class="cond-msg" id="perm-msg">Others cannot modify.</div>
+  <p class="perm-sub">Only the Owner can change rates and settings.</p>
   <div class="cond-acts">
-    <button type="button" class="btn primary" id="cond-back">&larr; Back to Calculator</button>
+    <button type="button" class="btn primary" id="cond-back">OK</button>
     <button type="button" class="btn" id="cond-owner">Owner Login</button>
   </div>
+ </div>
 </section>
 
 <div class="cols" id="calc-cols">
@@ -1299,17 +1311,14 @@ function syncLockUI(){
     ?"🔓 Owner Logged In (Rates & Settings Editable)"
     :"🔒 Rates Locked (Owner Login required to modify)";
 }
+// v1.4.5: show a "Permission Denied" pop-up over the calculator (calculator stays visible behind it)
 function showConditionsTab(){
-  $("calc-cols").hidden=true;
-  $("savedbox").hidden=true;
-  $("main-foot").hidden=true;
-  $("main-rights").hidden=true;
-  $("t-fire").hidden=true; $("t-fire").setAttribute("aria-selected","false");
-  $("t-bgr").hidden=true; $("t-bgr").setAttribute("aria-selected","false");
-  $("t-cond").hidden=false; $("t-cond").setAttribute("aria-selected","true");
   $("p-conditions").hidden=false;
-  window.scrollTo(0,0);
+  setTimeout(()=>{try{$("cond-back").focus();}catch(e){}},0);
 }
+function closePermPopup(){ $("p-conditions").hidden=true; }
+$("p-conditions").addEventListener("click",e=>{ if(e.target===$("p-conditions")) closePermPopup(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("p-conditions").hidden) closePermPopup(); });
 
 // Intercept any attempt to modify a rate when Owner is not logged in -> show ONLY Conditions tab
 function guardRateAttempt(e){
@@ -1369,8 +1378,8 @@ $("lback").addEventListener("click",()=>{
   if(LOGIN_RETURN==="cond") showConditionsTab();
   else showTab(tab);
 });
-$("cond-back").addEventListener("click",()=>showTab(tab));
-$("cond-owner").addEventListener("click",()=>openOwnerLogin("cond"));
+$("cond-back").addEventListener("click",closePermPopup);
+$("cond-owner").addEventListener("click",()=>{closePermPopup();openOwnerLogin("cond");});
 $("btn-owner-open").addEventListener("click",()=>openOwnerLogin("main"));
 $("btn-owner-lock").addEventListener("click",lockRates);
 $("btn-lock").addEventListener("click",lockRates);
@@ -2178,5 +2187,136 @@ html body #v-welcome .gate-btn-main:hover{transform:translateY(-2px);box-shadow:
 html body #v-welcome .gate-foot{width:100%!important;margin:28px 0 0!important;padding:14px 0 0!important;border-top:1px solid #eef1f6!important;justify-content:center!important;text-align:center!important;color:#94a0b4!important;font-size:.74rem!important;display:flex!important}
 </style>
 
+
+<style id="kinsure-theme-midnight">
+/* v1.4.8: Midnight + Light grey + Sunflower theme, grey #7F7D7D screen. Colours only; logo, layout and calculations unchanged. */
+/* K-iNSURE preview theme: Midnight + Light Grey + Sunflower Yellow */
+:root,:root[data-theme]{
+  --mid:#0B1730; --mid2:#16264A; --mid3:#22365F;
+  --grey-bg:#ECEEF2; --grey-field:#F5F6F8; --grey-line:#D5D9E0; --grey-mute:#5E6878;
+  --sun:#FFC21A; --sun-deep:#E6A800; --sun-soft:#FFF3C4;
+  --bg:#ECEEF2!important; --surface:#FFFFFF!important; --fg:#0B1730!important; --muted:#5E6878!important;
+  --line:#D5D9E0!important; --field:#F5F6F8!important;
+  --navy:#0B1730!important; --navy-fg:#FFFFFF!important; --navy-mute:#C9D0DE!important;
+  --accent:#0B1730!important; --focus:#E6A800!important;
+  --lemon:#FFC21A!important; --lemon-bd:#E6A800!important; --lemon-fg:#0B1730!important; --tint:#FFF3C4!important;
+}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .app,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-tab-panel{background:#ECEEF2!important}
+/* Top bands */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body header.band,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band{background:linear-gradient(120deg,#0B1730 0%,#16264A 100%)!important;border-bottom:3px solid #FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band h1,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band label,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band .header-field label{color:#FFFFFF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band small{color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureSelectedVehicleName{background:#FFC21A!important;color:#0B1730!important;border-color:#FFC21A!important;font-weight:800!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .header-action-btn,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .home-btn{background:transparent!important;border:1.5px solid #FFC21A!important;color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .header-action-btn:hover,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .home-btn:hover{background:#FFC21A!important;color:#0B1730!important}
+/* Cards */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .card,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body section.card{background:#FFFFFF!important;border-color:#D5D9E0!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .card h2,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body section h2{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .card h2::before{background:#FFC21A!important}
+/* Fields */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body input:not([type=checkbox]):not([type=radio]),html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body select,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body textarea{background:#F5F6F8!important;border-color:#D5D9E0!important;color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body input:focus,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body select:focus{border-color:#E6A800!important;box-shadow:0 0 0 3px rgba(255,194,26,.35)!important;outline:none!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band select,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band input{background:#FFFFFF!important}
+/* Group titles */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .addon-group-title,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #sumDiscountTop h3,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .sec-title,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .card h3{color:#B07F00!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .addon-group-title::after{background:#D5D9E0!important}
+/* Light panels that were teal */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #sumDiscountTop,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body label.chk.tp{background:#F5F6F8!important;border-color:#D5D9E0!important}
+/* Add-on tiles */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .addon-pick{background:#FFFFFF!important;border-color:#D5D9E0!important;color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .addon-pick:has(input:checked){background:#FFF3C4!important;border-color:#FFC21A!important;box-shadow:inset 4px 0 0 #FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body input[type=checkbox],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body input[type=radio]{accent-color:#0B1730!important}
+/* Total cards */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .slip .total{background:linear-gradient(135deg,#0B1730 0%,#16264A 100%)!important;color:#FFFFFF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total .big,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #tot,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .slip .big{color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total h2{color:#C9D0DE!important}
+/* Primary buttons */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .btn.primary,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #bprev{background:#FFC21A!important;color:#0B1730!important;border:0!important;font-weight:800!important;box-shadow:0 4px 14px rgba(230,168,0,.35)!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .btn.primary:hover,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #bprev:hover{background:#E6A800!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .btn:not(.primary){border-color:#0B1730!important;color:#0B1730!important;background:#FFFFFF!important}
+/* Fire: zone + tabs + chips */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .tab[aria-selected=true]{background:#FFC21A!important;color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .tab{color:#FFFFFF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .zbtn[aria-pressed=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .zbtn.on,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .zone-btn.on{background:#0B1730!important;color:#FFC21A!important;border-color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .chip[aria-pressed=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .subtab[aria-pressed=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .seg button[aria-pressed=true]{background:#FFF3C4!important;border-color:#FFC21A!important;color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .num,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .code,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .rcode{color:#0B1730!important}
+/* Sticky bottom bar (Fire) */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .foot,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main-foot,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .stickybar{background:linear-gradient(120deg,#0B1730,#16264A)!important;border-top:3px solid #FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main-foot .btn:not(.primary):not(.wa){background:transparent!important;color:#FFFFFF!important;border-color:#C9D0DE!important}
+/* v3 fixes */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-group-heading,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-group-heading *{color:#B07F00!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total .ka-split span:nth-child(1),html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .ka-legend>div:nth-child(1)>i{background:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total .ka-split span:nth-child(2),html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .ka-legend>div:nth-child(2)>i{background:#C9D0DE!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total .ka-split span:nth-child(3),html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .ka-legend>div:nth-child(3)>i{background:#6B778C!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total *{border-color:rgba(255,255,255,.14)!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #bsave,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #bclear{background:#FFFFFF!important;color:#0B1730!important;border:1.5px solid #0B1730!important;opacity:1!important;filter:none!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .btn.wa,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #bwa,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #pwa{background:#1FAF5A!important;color:#FFFFFF!important;border:0!important}
+/* v5: text colours for the new palette */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body label,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .lbl,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #zl{color:#16264A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band label,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band .header-field label{color:#E6E9EF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .hint,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body small,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .sub-hint,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #count{color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body ::placeholder{color:#9AA1AD!important;opacity:1!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-detail-row span,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-detail-empty{color:#4A5263!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-detail-row strong,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-group-total,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-group-total *{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-breakdown-group span:only-child{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total span,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total b,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .ka-legend span{color:#E6E9EF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total .ka-legend b{color:#FFFFFF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total-payable-label,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total h2,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .slip .total h2{color:#FFC21A!important;opacity:1!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total .sub,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .slip .sub{color:#C9D0DE!important}
+/* Fire */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .subtab[aria-pressed=true]{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .subtab:not([aria-pressed=true]){color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body span.c,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .rcode,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .code{color:#B07F00!important;font-weight:800!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .list span:not(.c),html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .rows span:not(.c){color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .zbtn small{color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .zbtn[aria-pressed=true] small,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .zbtn.on small{color:#FFE08A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .sum dt{color:#4A5263!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .sum dd,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .sum .strong dt,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .sum .strong dd{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #ftot,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .foot .amt{color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .foot .cap,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .foot .words,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .foot .status,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fwords,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #status{color:#C9D0DE!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .rights,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main-rights,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body footer{color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .rights a,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main-rights a{color:#0B1730!important;text-decoration-color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-payable-total{background:#FFF3C4!important;border-color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-payable-total span,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-payable-total strong{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-standard,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-united{color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-standard[aria-pressed=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-united[aria-pressed=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-standard.on,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-united.on,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-standard[aria-selected=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-united[aria-selected=true]{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .app{--acc:#0B1730!important;--accent:#0B1730!important;--ink:#0B1730!important;--mut:#5E6878!important;--ln:#D5D9E0!important;--soft:#F5F6F8!important}
+/* v6: screen background = user's grey #7F7D7D */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .app,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-tab-panel,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-main,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body main{background:#7F7D7D!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body{--bg:#7F7D7D!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .card,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body section.card,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .slip{box-shadow:0 6px 20px rgba(0,0,0,.18)!important;border-color:#A9A8A8!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .rights,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main-rights,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body footer,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .copyright{color:#FFFFFF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .rights a,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main-rights a{color:#FFC21A!important}
+
+
+/* v1.4.8: start, vehicle-class and login screens. Logo images untouched. */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureWelcome,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureVehicleClassStart,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsurePolicyStart,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .gate-wrap,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-welcome,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-choose,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-login{background:#7F7D7D!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureWelcome button{background:#FFC21A!important;color:#0B1730!important;box-shadow:0 6px 18px rgba(230,168,0,.4)!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureWelcome div[style*="letter-spacing"],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureWelcome span[style*="letter-spacing"]{background:#FFF3C4!important;color:#0B1730!important;border-color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureVehicleClassStart>div,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsurePolicyStart>div{border-top:4px solid #FFC21A!important;background-image:none!important;background-color:#FFFFFF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureVehicleClassStart>div::before,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsurePolicyStart>div::before{background:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureVehicleCategoryTabs{background:#ECEEF2!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-category-tab{color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-category-tab[aria-selected=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-category-tab.active,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-category-tab.is-active{background:#0B1730!important;color:#FFC21A!important;border-color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-class-tab{color:#0B1730!important;border-color:#D5D9E0!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-class-tab[aria-pressed=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-class-tab[aria-selected=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-class-tab.active,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-class-tab.selected,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-class-tab.is-selected{background:#FFF3C4!important;border-color:#FFC21A!important;box-shadow:inset 4px 0 0 #FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureVehicleClassHint{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureStartContinue{background:#FFC21A!important;color:#0B1730!important;box-shadow:0 6px 18px rgba(230,168,0,.4)!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureVehicleClassStart label{color:#5E6878!important}
+/* Fire gates */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .gate-top{background:linear-gradient(120deg,#0B1730,#16264A)!important;border-bottom:3px solid #FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .gate-top p{color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .gate-btn-main,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #btn-start,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #btn-login{background:#FFC21A!important;color:#0B1730!important;border:0!important;font-weight:800!important;box-shadow:0 6px 18px rgba(230,168,0,.35)!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #toggle-pw{background:#0B1730!important;color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .back-link,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #lback,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #cback{background:transparent!important;color:#0B1730!important;border:1.5px solid #0B1730!important;text-decoration:none!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .choice-arrow{background:#FFF3C4!important;color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-choose b{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-choose span:not(.choice-arrow){color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-welcome h1{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-welcome p{color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .gate-foot,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .gate-foot a{color:#5E6878!important}
+
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #status,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .status{color:#FFFFFF!important}
+</style>
 </body>
 </html>

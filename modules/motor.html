@@ -3297,7 +3297,7 @@ body{padding-block:8px 10px}
 <p class="addon-subtitle">Select a cover to activate it and configure its premium inputs.</p>
 <div class="addon-button-grid">
 <label class="addon-pick" data-addon-classes="pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc" data-addon-kind="check" data-addon-target="ndEnabled"><input id="addonPick_ndEnabled" type="checkbox"/><span>Nil Depreciation</span></label>
-<label class="addon-pick" data-addon-classes="pc epc w2 e2w taxi etaxi pauto bus" data-addon-kind="automatic" data-addon-target="enginePlatinumEnabled"><input id="addonPick_enginePlatinumEnabled" type="checkbox"/><span>Engine Protection (Platinum)</span></label>
+<label class="addon-pick" data-addon-classes="pc w2 taxi pauto bus" data-addon-kind="automatic" data-addon-target="enginePlatinumEnabled"><input id="addonPick_enginePlatinumEnabled" type="checkbox"/><span>Engine Protection (Platinum)</span></label>
 <label class="addon-pick" data-addon-classes="pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4" data-addon-kind="check" data-addon-target="consumablesProtectEnabled"><input id="addonPick_consumablesProtectEnabled" type="checkbox"/><span>Consumables</span></label>
 <label class="addon-pick" data-addon-classes="pc epc taxi etaxi w2 e2w" data-addon-kind="check" data-addon-target="keyProtectEnabled"><input id="addonPick_keyProtectEnabled" type="checkbox"/><span>Loss of Key</span></label>
 <label class="addon-pick" data-addon-classes="w2 e2w c4 ec4" data-addon-kind="check" data-addon-target="tyreRimProtectEnabled"><input id="addonPick_tyreRimProtectEnabled" type="checkbox"/><span>Tyre &amp; Rim — Two-Wheeler</span></label>
@@ -3308,8 +3308,8 @@ body{padding-block:8px 10px}
 <label class="addon-pick" data-addon-classes="pc epc e2w ec4 taxi etaxi pauto gauto lorry bus" data-addon-kind="check" data-addon-target="evProtectEnabled"><input id="addonPick_evProtectEnabled" type="checkbox"/><span>EV Protect</span></label>
 <label class="addon-pick" data-addon-classes="pc epc w2 e2w taxi etaxi pauto gauto lorry bus" data-addon-kind="check" data-addon-target="personalBelongingsEnabled"><input id="addonPick_personalBelongingsEnabled" type="checkbox"/><span>Personal Belongings</span></label>
 <label class="addon-pick" data-addon-classes="pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc" data-addon-kind="check" data-addon-target="platinumPAEnabled"><input id="addonPick_platinumPAEnabled" type="checkbox"/><span>Platinum PA</span></label>
-<label class="addon-pick" data-addon-classes="pc epc w2 e2w taxi etaxi" data-addon-kind="amount" data-addon-target="engp"><input id="addonPick_engp" type="checkbox"/><span>Engine Protection — Manual</span></label>
-<label class="addon-pick" data-addon-classes="pc epc w2 e2w taxi etaxi" data-addon-kind="amount" data-addon-target="enggear"><input id="addonPick_enggear" type="checkbox"/><span>Engine &amp; Gearbox</span></label>
+<label class="addon-pick" data-addon-classes="pc w2 taxi" data-addon-kind="amount" data-addon-target="engp"><input id="addonPick_engp" type="checkbox"/><span>Engine Protection — Manual</span></label>
+<label class="addon-pick" data-addon-classes="pc w2 taxi" data-addon-kind="amount" data-addon-target="enggear"><input id="addonPick_enggear" type="checkbox"/><span>Engine &amp; Gearbox</span></label>
 <label class="addon-pick" data-addon-classes="pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc" data-addon-kind="amount" data-addon-target="tow"><input id="addonPick_tow" type="checkbox"/><span>Towing Charges</span></label>
 <label class="addon-pick" data-addon-classes="pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc" data-addon-kind="amount" data-addon-target="med"><input id="addonPick_med" type="checkbox"/><span>Medical Expenses</span></label>
 <label class="addon-pick" data-addon-classes="pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc" data-addon-kind="amount" data-addon-target="pe"><input id="addonPick_pe" type="checkbox"/><span>Personal Effects</span></label>
@@ -3614,6 +3614,8 @@ window.addEventListener('DOMContentLoaded', function() {
 </style>
 <script>
 //ENGINE-START
+/* v1.4.7: Electric Vehicle classes (no Engine Protection covers). */
+var K_EV_CLASSES=["epc","e2w","ec4","etaxi"];
 const MOTOR={
  pc:{name:"Private car",zones:true,terms:[1,3],ltcpa:true,ages:["Up to 5 years","5 to 10 years","Above 10 years"],dimLabel:"Engine capacity",dims:["Up to 1000 cc","1000 to 1500 cc","Above 1500 cc"],
    rates:[[3.127,3.283,3.44],[3.1,3.443,3.612],[3.362,3.612,3.698]],ratesB:[[3.039,3.391,3.343],[3.191,3.51,3.51],[3.267,3.51,3.594]],disc:60,act:[2094,3416,7897],actLong:[6521,10640,24596],nd:"basic",paSeat:true,paRate:0.05,ll:true},
@@ -3621,7 +3623,7 @@ const MOTOR={
    disc:60,act:[1780,2904,6712],actLong:[5543,9044,20907],nd:"basic",paSeat:true,paRate:0.05,ll:true},
  w2:{name:"Two wheeler",zones:true,terms:[1,5],ltcpa:true,ages:["Up to 5 years","5 to 10 years","Above 10 years"],dimLabel:"Engine capacity",dims:["Up to 75 cc","75 to 150 cc","150 to 350 cc","Above 350 cc"],
    rates:[[1.708,1.708,1.793,1.879],[1.793,1.793,1.883,1.973],[1.836,1.836,1.928,2.02]],ratesB:[[1.676,1.676,1.76,1.844],[1.76,1.76,1.848,1.936],[1.802,1.802,1.892,1.982]],disc:60,act:[538,714,1366,2804],actLong:[2901,3851,7365,15117],nd:"disc",paSeat:true,paRate:0.07,ll:false},
- e2w:{name:"E-Two Wheeler",zones:true,terms:[1,3],ltcpa:true,rateFrom:"w2",ages:["Up to 5 years","5 to 10 years","Above 10 years"],dimLabel:"Motor power",dims:["Up to 3 kW","Above 3 to 7 kW","Above 7 to 16 kW","Above 16 kW"],
+ e2w:{name:"E-Two Wheeler",zones:true,terms:[1,5],ltcpa:true,rateFrom:"w2",ages:["Up to 5 years","5 to 10 years","Above 10 years"],dimLabel:"Motor power",dims:["Up to 3 kW","Above 3 to 7 kW","Above 7 to 16 kW","Above 16 kW"],
    disc:60,act:[410,639,1014,1975],actLong:[888,2792,4635,11079],nd:"disc",paSeat:true,paRate:0.05,ll:false},
  c4:{name:"2W Passenger",zones:true,rateFrom:"w2",ages:["Up to 5 years","5 to 10 years","Above 10 years"],dimLabel:"Engine capacity",dims:["Up to 75 cc","75 to 150 cc","150 to 350 cc","Above 350 cc"],
    disc:60,act:[861,861,861,2254],seatTPFlat:580,nd:"disc",ll:false,seats:"Passengers carried"},
@@ -3672,12 +3674,12 @@ function motorCalc(id,i,R){
   // User-supplied long-term bundled OD tariffs apply only to the specifically
   // selected ICE Private Car 3Y/3Y or ICE Two-Wheeler 5Y/5Y package.
   const bundleFuel=String(i.fuel||"");
-  if(od&&i.isBundled===true&&bundleFuel!=="Electric"){
+  if(od&&i.isBundled===true&&(bundleFuel!=="Electric"||id==="epc"||id==="e2w")){
     const pcBundleRates=[[6.442,6.763,7.086],[6.26,6.573,6.886]];
     const w2BundleRates=[[4.2,4.2,4.4,4.65],[4.1,4.1,4.35,4.55]];
-    if(id==="pc"&&i.bundleVariant==="pc3_3"){
+    if((id==="pc"&&i.bundleVariant==="pc3_3")||(id==="epc"&&i.bundleVariant==="epc3_3")){
       rate=N((pcBundleRates[Math.max(0,Math.min(1,+i.zone||0))]||[])[dimIdx]);basic=idv*rate/100;
-    }else if(id==="w2"&&i.bundleVariant==="w25_5"){
+    }else if((id==="w2"&&i.bundleVariant==="w25_5")||(id==="e2w"&&i.bundleVariant==="e2w5_5")){
       rate=N((w2BundleRates[Math.max(0,Math.min(1,+i.zone||0))]||[])[dimIdx]);basic=idv*rate/100;
     }
   }
@@ -3830,7 +3832,9 @@ function motorCalc(id,i,R){
   const ncbOnRti=rtiPremium*effectiveNcb/100;
   ncbBase+=rtiPremium; ncbAmt+=ncbOnRti; netOD-=ncbOnRti;
   const man={};let manSum=0;
-  ["engp","enggear"].forEach(k=>{man[k]=(od&&i.addonActive?.[k])?Math.max(0,N(i[k])):0;manSum+=man[k];});
+  // v1.4.7: Engine Protection covers are not available for Electric Vehicles.
+  const kNoEngineEV=K_EV_CLASSES.includes(id);
+  ["engp","enggear"].forEach(k=>{man[k]=(od&&!kNoEngineEV&&i.addonActive?.[k])?Math.max(0,N(i[k])):0;manSum+=man[k];});
   man.rsa=(od&&i.addonActive?.rsa)?ADDON_RATES.rsa:0; manSum+=man.rsa;
   man.tow=(od&&i.addonActive?.tow&&N(i.tow)>0&&N(i.tow)<=1500)?ADDON_RATES.towing:0;
   man.med=(od&&i.addonActive?.med)?(N(i.med)===50000?ADDON_RATES.medical50000:(N(i.med)===100000?ADDON_RATES.medical100000:0)):0;
@@ -3846,7 +3850,7 @@ function motorCalc(id,i,R){
     enginePlatinumPrivateCar?ADDON_RATES.enginePlatinumPrivateCar.map(Number):
     enginePlatinumPassengerCommercial?ADDON_RATES.enginePlatinumPassengerCommercial.map(Number):[];
   const enginePlatinumRate=enginePlatinumBand>=0?(enginePlatinumRates[enginePlatinumBand]||0):0;
-  const enginePlatinum=(od&&i.addonActive?.enginePlatinumEnabled&&enginePlatinumRate>0)?idv*enginePlatinumRate/100:0;
+  const enginePlatinum=(od&&!kNoEngineEV&&i.addonActive?.enginePlatinumEnabled&&enginePlatinumRate>0)?idv*enginePlatinumRate/100:0;
   const extras=efit+rtc+builtInCngOD+cngOD+trailerOD+manSum+keyProtect+personalBelongings+platinumPA+tyreRimProtect+tyreRimCarProtect+consumablesProtect+emiProtect+enginePlatinum;
   const liability=act+seatTP+pa+ltpa+ll+emp+nfpp+cng+trailerTP;
   let gOD,gTP=0;
@@ -4285,17 +4289,22 @@ function lines(id,i,r){
   tax.push(["Total payable",inr(r.total),"strong"]);
   return {od:isTP?od.filter(x=>/\(add-on\)$|^Electrical|^Road tax/.test(x[0])):od,tp:isOD?[]:tp,tax};
 }
+/* v1.4.5: Bundled policy terms (TP years / OD years) for every bundled option. */
+const K_BUNDLE_TERMS={pc1_3:[3,1],pc3_3:[3,3],w21_5:[5,1],w25_5:[5,5],epc1_3:[3,1],epc3_3:[3,3],e2w1_5:[5,1],e2w5_5:[5,5],e2w1_3:[5,1]};
+function kBundleTerm(v){return (K_BUNDLE_TERMS[v]||[5,1])[0];}
+function kBundleODTerm(v){return (K_BUNDLE_TERMS[v]||[5,1])[1];}
 function updatePolicyOptions(){
   const sel=$("ptype");
   const previous=sel.value;
   const vehicleType=String($("vehicleType")?.value||"").trim().toLowerCase();
   const isNewVehicle=vehicleType==="new";
-  // Bundled policies are available only for New, non-electric Private Cars and Two Wheelers.
-  const bundleEligible=(cls==="pc"||cls==="w2")&&isNewVehicle;
+  // Bundled policies are available for New Private Cars and Two Wheelers,
+  // and (v1.4.5) for New E-Private Cars and E-Two Wheelers.
+  const bundleEligible=["pc","w2","epc","e2w"].includes(cls)&&isNewVehicle;
   const bundleBox=document.getElementById("bundleVariantBox");
   if(bundleBox)bundleBox.setAttribute("data-bundle-ineligible",String(!bundleEligible));
   const hasSeparateOD=["pc","epc","w2","e2w"].includes(cls);
-  const bundleLabel=cls==="pc"?"Bundled policy (Private Car)":"Bundled policy (Two Wheeler)";
+  const bundleLabel=({pc:"Bundled policy (Private Car)",w2:"Bundled policy (Two Wheeler)",epc:"Bundled policy (E-Private Car)",e2w:"Bundled policy (E-Two Wheeler)"})[cls]||"Bundled policy";
   const opts=hasSeparateOD
     ?[["comp","Comprehensive"],["tp","Third Party only"],["od","Standalone OD"],...(bundleEligible?[["bundle",bundleLabel]]:[])]
     :[["comp","Comprehensive"],["tp","Third Party only"]];
@@ -4313,7 +4322,11 @@ function updatePolicyOptions(){
       ?[["pc1_3","BDL-1Yr OD + 3Yr TP"],["pc3_3","BDL-3Yr OD + 3Yr TP"]]
       :cls==="w2"
         ?[["w21_5","BDL-1Yr OD + 5Yr TP"],["w25_5","BDL-5Yr OD + 5Yr TP"]]
-        :[];
+        :cls==="epc"
+          ?[["epc1_3","BDL-1Yr OD + 3Yr TP"],["epc3_3","BDL-3Yr OD + 3Yr TP"]]
+          :cls==="e2w"
+            ?[["e2w1_5","BDL-1Yr OD + 5Yr TP"],["e2w5_5","BDL-5Yr OD + 5Yr TP"]]
+            :[];
     const prior=variant.value;
     variant.innerHTML=choices.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join("");
     if(bundleEligible&&sel.value==="bundle"&&choices.some(o=>o[0]===prior)){
@@ -4450,7 +4463,7 @@ function enforceCoverRules(){
   Object.entries(controls).forEach(([id,blocked])=>{const el=$(id);if(!el)return;el.disabled=blocked;if(blocked&&el.tagName==="INPUT")el.value="0";});
   const enginePlatinumBand=enginePlatinumBandByDates($("cr").value,isoDate(new Date()));
   const enginePlatinumPassengerCommercial=["taxi","etaxi","pauto","bus"].includes(cls)&&Number($("seats").value||0)>=1&&Number($("seats").value||0)<=18;
-  const enginePlatinumClassOK=["pc","epc","w2","e2w"].includes(cls)||enginePlatinumPassengerCommercial;
+  const enginePlatinumClassOK=!K_EV_CLASSES.includes(cls)&&(["pc","w2"].includes(cls)||enginePlatinumPassengerCommercial);
   const enginePlatinumBandOK=enginePlatinumPassengerCommercial?enginePlatinumBand>=0&&enginePlatinumBand<=2:enginePlatinumBand>=0&&enginePlatinumBand<=4;
   const enginePlatinumBlocked=$("ptype").value==="tp"||!enginePlatinumBandOK||!enginePlatinumClassOK;
   $("enginePlatinumEnabled").disabled=enginePlatinumBlocked;
@@ -4537,7 +4550,7 @@ function enforceCoverRules(){
   $("personalBelongingsInfo").textContent=personalBelongingsEligible
     ? "₹5,000 cover: premium ₹250. ₹10,000 cover: premium ₹500. Fixed premium is included in the own-damage add-on breakdown and applicable GST. Confirm insurer product eligibility and terms."
     : "Personal Belongings Add-on is not applied to third-party-only policies.";
-  const platinumTerm=$("ptype").value==="bundle"?Number((R[cls].terms||[1])[1]||1):(Number($("term").value)||1);
+  const platinumTerm=$("ptype").value==="bundle"?kBundleTerm($("bundleVariant")?.value||""):(Number($("term").value)||1);
   const platinumTermEligible=platinumTerm===1||platinumTerm===3;
   const platinumBlocked=$("ptype").value==="tp"||!platinumTermEligible;
   $("platinumPAEnabled").disabled=platinumBlocked;
@@ -4617,7 +4630,8 @@ function updateEnginePlatinumStatus(i,r){
   const clsName=({pc:"Private Car",epc:"Electric Private Car",w2:"Two-Wheeler",e2w:"Electric Two-Wheeler",taxi:"Passenger Commercial",pauto:"Passenger Commercial",bus:"Passenger Commercial"})[cls]||"This vehicle class";
   const seats=Number(i.seats||0);
   const passengerCommercial=["taxi","etaxi","pauto","bus"].includes(cls)&&seats>=1&&seats<=18;
-  const classOK=["pc","epc","w2","e2w"].includes(cls)||passengerCommercial;
+  const classOK=!K_EV_CLASSES.includes(cls)&&(["pc","w2"].includes(cls)||passengerCommercial);
+  if(K_EV_CLASSES.includes(cls)){el.textContent="Engine Protection is not available for Electric Vehicles.";return;}
   if(i.ptype==="tp"){el.textContent="Not available with Third Party Only.";return;}
   if(!classOK){el.textContent="Not rated for this vehicle class in the supplied Engine Protection (Platinum) table.";return;}
   if(band<0){el.textContent="Enter a valid Date of Purchase. Vehicle age is calculated as of today; renewal date is used only for NCB.";return;}
@@ -4713,7 +4727,7 @@ function calc(){
   applyPtype();
   updatePcLiabilityControls();
   try {
-  const i=inputs();if(i.ptype==="bundle"){i.isBundled=true;i.term=(i.bundleVariant==="pc1_3"||i.bundleVariant==="pc3_3"||i.bundleVariant==="epc1_3"||i.bundleVariant==="e2w1_3")?"3":"5";i.bundleODTerm=(i.bundleVariant==="pc3_3"?3:i.bundleVariant==="w25_5"?5:1);i.ptype="comp";}if(i.ptype==="tp")i.idv="0";const r=motorCalc(cls,i,R),L=lines(cls,i,r),c=R[cls];if($("rti"))$("rti").value=(r.man&&r.man.rti? r.man.rti:0).toFixed(2);updateNilDepreciationStatus(i,r);updateRTIStatus(i,r);updateEnginePlatinumStatus(i,r);
+  const i=inputs();if(i.ptype==="bundle"){i.isBundled=true;i.term=String(kBundleTerm(i.bundleVariant));i.bundleODTerm=kBundleODTerm(i.bundleVariant);i.ptype="comp";}if(i.ptype==="tp")i.idv="0";const r=motorCalc(cls,i,R),L=lines(cls,i,r),c=R[cls];if($("rti"))$("rti").value=(r.man&&r.man.rti? r.man.rti:0).toFixed(2);updateNilDepreciationStatus(i,r);updateRTIStatus(i,r);updateEnginePlatinumStatus(i,r);
   const row=a=>`<div class="${a[2]||""}"><dt>${esc(a[0])}</dt><dd>${esc(a[1])}</dd></div>`;
   $("tot").textContent=inr(r.total);
   const vehicleMeta = [
@@ -5055,8 +5069,8 @@ $("vc").innerHTML=Object.keys(R).map(k=>`<option value="${k}">${esc(R[k].name)}<
 $("vc").addEventListener("change",()=>{setClass($("vc").value,false);applyClassSpecificVisibility();autoSelectTariffZone();calc();});
 $("proposerName").addEventListener("input",()=>{autoSelectTariffZone();calc();});
 $("proposerName").addEventListener("change",()=>{autoSelectTariffZone();calc();});
-$("ptype").addEventListener("change",()=>{updatePolicyOptions();if($("ptype").value==="bundle"){const v=$("bundleVariant")?.value||"";$("term").value=(v.includes("_3")?"3":"5");}calc();});
-$("bundleVariant")?.addEventListener("change",()=>{calc();});
+$("ptype").addEventListener("change",()=>{updatePolicyOptions();if($("ptype").value==="bundle"){const v=$("bundleVariant")?.value||"";$("term").value=String(kBundleTerm(v));}calc();});
+$("bundleVariant")?.addEventListener("change",()=>{const v=$("bundleVariant").value||"";if($("ptype").value==="bundle"&&v)$("term").value=String(kBundleTerm(v));calc();});
 $("cpaTenure")?.addEventListener("change",()=>{calc();});
 $("llTenure")?.addEventListener("change",()=>{calc();});
 $("fuel").addEventListener("change",()=>{updateFuelOptions();calc();});
@@ -5591,7 +5605,7 @@ SHEET_CSS+=`
 function sheetHTML(q){
   const id=q.cls,c=R[id],i=q.inp,e=esc;
   const ii=Object.assign({},i,{age:+i.vage||0,dim:+i.vdim||0,paSeats:i.paseats,paSi:i.pasi,ageMonths:ageMonths(q.regd,q.ason)});
-  if(ii.ptype==="bundle"){ii.isBundled=true;ii.term=(ii.bundleVariant==="pc1_3"||ii.bundleVariant==="pc3_3"||ii.bundleVariant==="epc1_3"||ii.bundleVariant==="e2w1_3")?"3":"5";ii.bundleODTerm=(ii.bundleVariant==="pc3_3"?3:ii.bundleVariant==="w25_5"?5:1);ii.ptype="comp";}
+  if(ii.ptype==="bundle"){ii.isBundled=true;ii.term=String(kBundleTerm(ii.bundleVariant));ii.bundleODTerm=kBundleODTerm(ii.bundleVariant);ii.ptype="comp";}
   if(ii.ptype==="tp")ii.idv="0";
   const r=motorCalc(id,ii,R),L=lines(id,ii,r),tpOnly=ii.ptype==="tp";
   const fmt=n=>inr(Math.round(Number(n)||0));
@@ -5640,7 +5654,7 @@ function sheetHTML(q){
   const taxRows=L.tax.filter(a=>a[0]!=="Total payable");
   const taxHtml=taxRows.map(a=>`<tr><td>${e(quoteLabel(a[0]))}</td><td class="n">${e(a[1])}</td></tr>`).join("");
   const kv=(k,v)=>`<tr><td>${e(k)}</td><td class="n">${v||"—"}</td></tr>`;
-  const policy=({pc1_3:"BDL-1Yr OD + 3Yr TP",pc3_3:"BDL-3Yr OD + 3Yr TP",w21_5:"BDL-1Yr OD + 5Yr TP",w25_5:"BDL-5Yr OD + 5Yr TP",epc1_3:"BDL-1Yr OD + 3Yr TP",e2w1_3:"BDL-1Yr OD + 3Yr TP"}[ii.bundleVariant])||(ii.ptype==="tp"?"Third Party Only":ii.ptype==="od"?"Standalone OD":"Comprehensive");
+  const policy=({pc1_3:"BDL-1Yr OD + 3Yr TP",pc3_3:"BDL-3Yr OD + 3Yr TP",w21_5:"BDL-1Yr OD + 5Yr TP",w25_5:"BDL-5Yr OD + 5Yr TP",epc1_3:"BDL-1Yr OD + 3Yr TP",epc3_3:"BDL-3Yr OD + 3Yr TP",e2w1_5:"BDL-1Yr OD + 5Yr TP",e2w5_5:"BDL-5Yr OD + 5Yr TP",e2w1_3:"BDL-1Yr OD + 5Yr TP"}[ii.bundleVariant])||(ii.ptype==="tp"?"Third Party Only":ii.ptype==="od"?"Standalone OD":"Comprehensive");
   const ageM=ageMonths(q.regd,q.ason);
   const ageLabel=ageM!==null&&ageM>=0?ageText(ageM):"—";
   const basic=[
@@ -5747,7 +5761,7 @@ function doSave(asNew){
   // Customer details are hidden in this layout: fall back to the vehicle number, then make and model.
   if(!q.name)q.name=q.proposer||q.veh||"";
   if(!q.name){say("Enter the Vehicle Number (or make and model) to save the quotation.",true);($("proposerName")||$("cn")).focus();return;}
-  const saveInputs=inputs();if(saveInputs.ptype==="bundle"){saveInputs.isBundled=true;saveInputs.term=(saveInputs.bundleVariant==="pc1_3"||saveInputs.bundleVariant==="pc3_3"||saveInputs.bundleVariant==="epc1_3"||saveInputs.bundleVariant==="e2w1_3")?"3":"5";saveInputs.bundleODTerm=(saveInputs.bundleVariant==="pc3_3"?3:saveInputs.bundleVariant==="w25_5"?5:1);saveInputs.ptype="comp";}const r=motorCalc(cls,saveInputs,R),now=Date.now(),keep=!asNew&&currentId;
+  const saveInputs=inputs();if(saveInputs.ptype==="bundle"){saveInputs.isBundled=true;saveInputs.term=String(kBundleTerm(saveInputs.bundleVariant));saveInputs.bundleODTerm=kBundleODTerm(saveInputs.bundleVariant);saveInputs.ptype="comp";}const r=motorCalc(cls,saveInputs,R),now=Date.now(),keep=!asNew&&currentId;
   const doc=Object.assign({},q,{total:Math.round(r.total*100)/100,createdAt:keep&&currentCreated?currentCreated:now,updatedAt:now});
   const id=keep?currentId:("m"+now);doc.id=id;
   const k=mem.findIndex(x=>x.id===id);if(k>=0)mem[k]=doc;else mem.push(doc);persist();
@@ -7788,8 +7802,8 @@ body.sotp.sotp-nocng .cols > section[aria-label="Coverages"] { display:none !imp
     evProtectEnabled:{classes:"pc epc e2w ec4 taxi etaxi pauto gauto lorry bus",fields:["evProtectEnabled"]},
     personalBelongingsEnabled:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus",fields:["personalBelongingsEnabled","personalBelongingsLimit"]},
     platinumPAEnabled:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc",fields:["platinumPAEnabled","platinumPASumInsured","platinumPASeats"]},
-    engp:{classes:"pc epc w2 e2w taxi etaxi",fields:["engp"]},
-    enggear:{classes:"pc epc w2 e2w taxi etaxi",fields:["enggear"]},
+    engp:{classes:"pc w2 taxi",fields:["engp"]},
+    enggear:{classes:"pc w2 taxi",fields:["enggear"]},
     tow:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc",fields:["towLimit","tow"]},
     med:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc",fields:["medLimit","med"]},
     pe:{classes:"pc epc w2 e2w taxi etaxi pauto gauto lorry bus c4 ec4 misc",fields:["peLimit","pe"]},
@@ -8739,7 +8753,7 @@ html body #tab-motor #prev#prev#prev .pv-bar.k-actions #psave{background:#0f2747
 
   /* Build a standalone copy of the quotation with the same look */
   function standalone(){
-    var css=[].slice.call(document.querySelectorAll('style')).map(function(s){return s.textContent;})
+    var css=[].slice.call(document.querySelectorAll('style:not(#kinsure-theme-midnight)')).map(function(s){return s.textContent;})
       .join('\n');
     var q=quote()||{};
     var title='K-iNSURE Motor Quotation'+(q.vno?' - '+q.vno:(q.name?' - '+q.name:''));
@@ -8798,4 +8812,137 @@ html body #tab-motor#tab-motor #prev#prev#prev .qgrand span,html body #tab-motor
   html body #tab-motor#tab-motor #prev#prev#prev .qgrand strong{font-size:24px!important}
   html body #tab-motor#tab-motor #prev#prev#prev .qgrand span{font-size:11px!important}
 }
+</style>
+
+<style id="kinsure-theme-midnight">
+/* v1.4.8: Midnight + Light grey + Sunflower theme, grey #7F7D7D screen. Colours only; logo, layout and calculations unchanged. */
+/* K-iNSURE preview theme: Midnight + Light Grey + Sunflower Yellow */
+:root,:root[data-theme]{
+  --mid:#0B1730; --mid2:#16264A; --mid3:#22365F;
+  --grey-bg:#ECEEF2; --grey-field:#F5F6F8; --grey-line:#D5D9E0; --grey-mute:#5E6878;
+  --sun:#FFC21A; --sun-deep:#E6A800; --sun-soft:#FFF3C4;
+  --bg:#ECEEF2!important; --surface:#FFFFFF!important; --fg:#0B1730!important; --muted:#5E6878!important;
+  --line:#D5D9E0!important; --field:#F5F6F8!important;
+  --navy:#0B1730!important; --navy-fg:#FFFFFF!important; --navy-mute:#C9D0DE!important;
+  --accent:#0B1730!important; --focus:#E6A800!important;
+  --lemon:#FFC21A!important; --lemon-bd:#E6A800!important; --lemon-fg:#0B1730!important; --tint:#FFF3C4!important;
+}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .app,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-tab-panel{background:#ECEEF2!important}
+/* Top bands */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body header.band,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band{background:linear-gradient(120deg,#0B1730 0%,#16264A 100%)!important;border-bottom:3px solid #FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band h1,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band label,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band .header-field label{color:#FFFFFF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band small{color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureSelectedVehicleName{background:#FFC21A!important;color:#0B1730!important;border-color:#FFC21A!important;font-weight:800!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .header-action-btn,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .home-btn{background:transparent!important;border:1.5px solid #FFC21A!important;color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .header-action-btn:hover,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .home-btn:hover{background:#FFC21A!important;color:#0B1730!important}
+/* Cards */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .card,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body section.card{background:#FFFFFF!important;border-color:#D5D9E0!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .card h2,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body section h2{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .card h2::before{background:#FFC21A!important}
+/* Fields */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body input:not([type=checkbox]):not([type=radio]),html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body select,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body textarea{background:#F5F6F8!important;border-color:#D5D9E0!important;color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body input:focus,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body select:focus{border-color:#E6A800!important;box-shadow:0 0 0 3px rgba(255,194,26,.35)!important;outline:none!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band select,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band input{background:#FFFFFF!important}
+/* Group titles */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .addon-group-title,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #sumDiscountTop h3,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .sec-title,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .card h3{color:#B07F00!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .addon-group-title::after{background:#D5D9E0!important}
+/* Light panels that were teal */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #sumDiscountTop,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body label.chk.tp{background:#F5F6F8!important;border-color:#D5D9E0!important}
+/* Add-on tiles */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .addon-pick{background:#FFFFFF!important;border-color:#D5D9E0!important;color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .addon-pick:has(input:checked){background:#FFF3C4!important;border-color:#FFC21A!important;box-shadow:inset 4px 0 0 #FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body input[type=checkbox],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body input[type=radio]{accent-color:#0B1730!important}
+/* Total cards */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .slip .total{background:linear-gradient(135deg,#0B1730 0%,#16264A 100%)!important;color:#FFFFFF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total .big,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #tot,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .slip .big{color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total h2{color:#C9D0DE!important}
+/* Primary buttons */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .btn.primary,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #bprev{background:#FFC21A!important;color:#0B1730!important;border:0!important;font-weight:800!important;box-shadow:0 4px 14px rgba(230,168,0,.35)!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .btn.primary:hover,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #bprev:hover{background:#E6A800!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .btn:not(.primary){border-color:#0B1730!important;color:#0B1730!important;background:#FFFFFF!important}
+/* Fire: zone + tabs + chips */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .tab[aria-selected=true]{background:#FFC21A!important;color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .tab{color:#FFFFFF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .zbtn[aria-pressed=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .zbtn.on,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .zone-btn.on{background:#0B1730!important;color:#FFC21A!important;border-color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .chip[aria-pressed=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .subtab[aria-pressed=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .seg button[aria-pressed=true]{background:#FFF3C4!important;border-color:#FFC21A!important;color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .num,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .code,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .rcode{color:#0B1730!important}
+/* Sticky bottom bar (Fire) */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .foot,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main-foot,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .stickybar{background:linear-gradient(120deg,#0B1730,#16264A)!important;border-top:3px solid #FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main-foot .btn:not(.primary):not(.wa){background:transparent!important;color:#FFFFFF!important;border-color:#C9D0DE!important}
+/* v3 fixes */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-group-heading,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-group-heading *{color:#B07F00!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total .ka-split span:nth-child(1),html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .ka-legend>div:nth-child(1)>i{background:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total .ka-split span:nth-child(2),html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .ka-legend>div:nth-child(2)>i{background:#C9D0DE!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total .ka-split span:nth-child(3),html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .ka-legend>div:nth-child(3)>i{background:#6B778C!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total *{border-color:rgba(255,255,255,.14)!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #bsave,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #bclear{background:#FFFFFF!important;color:#0B1730!important;border:1.5px solid #0B1730!important;opacity:1!important;filter:none!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .btn.wa,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #bwa,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #pwa{background:#1FAF5A!important;color:#FFFFFF!important;border:0!important}
+/* v5: text colours for the new palette */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body label,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .lbl,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #zl{color:#16264A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band label,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .band .header-field label{color:#E6E9EF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .hint,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body small,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .sub-hint,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #count{color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body ::placeholder{color:#9AA1AD!important;opacity:1!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-detail-row span,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-detail-empty{color:#4A5263!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-detail-row strong,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-group-total,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-group-total *{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-breakdown-group span:only-child{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total span,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total b,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .ka-legend span{color:#E6E9EF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total .ka-legend b{color:#FFFFFF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total-payable-label,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total h2,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .slip .total h2{color:#FFC21A!important;opacity:1!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .total .sub,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .slip .sub{color:#C9D0DE!important}
+/* Fire */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .subtab[aria-pressed=true]{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .subtab:not([aria-pressed=true]){color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body span.c,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .rcode,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .code{color:#B07F00!important;font-weight:800!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .list span:not(.c),html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .rows span:not(.c){color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .zbtn small{color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .zbtn[aria-pressed=true] small,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .zbtn.on small{color:#FFE08A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .sum dt{color:#4A5263!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .sum dd,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .sum .strong dt,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .sum .strong dd{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #ftot,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .foot .amt{color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .foot .cap,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .foot .words,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .foot .status,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fwords,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #status{color:#C9D0DE!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .rights,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main-rights,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body footer{color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .rights a,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main-rights a{color:#0B1730!important;text-decoration-color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-payable-total{background:#FFF3C4!important;border-color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-payable-total span,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .premium-payable-total strong{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-standard,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-united{color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-standard[aria-pressed=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-united[aria-pressed=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-standard.on,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-united.on,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-standard[aria-selected=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #fv-united[aria-selected=true]{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .app{--acc:#0B1730!important;--accent:#0B1730!important;--ink:#0B1730!important;--mut:#5E6878!important;--ln:#D5D9E0!important;--soft:#F5F6F8!important}
+/* v6: screen background = user's grey #7F7D7D */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .app,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-tab-panel,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-main,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body main{background:#7F7D7D!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body{--bg:#7F7D7D!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .card,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body section.card,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .slip{box-shadow:0 6px 20px rgba(0,0,0,.18)!important;border-color:#A9A8A8!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .rights,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main-rights,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body footer,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .copyright{color:#FFFFFF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .rights a,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #main-rights a{color:#FFC21A!important}
+
+
+/* v1.4.8: start, vehicle-class and login screens. Logo images untouched. */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureWelcome,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureVehicleClassStart,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsurePolicyStart,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .gate-wrap,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-welcome,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-choose,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-login{background:#7F7D7D!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureWelcome button{background:#FFC21A!important;color:#0B1730!important;box-shadow:0 6px 18px rgba(230,168,0,.4)!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureWelcome div[style*="letter-spacing"],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureWelcome span[style*="letter-spacing"]{background:#FFF3C4!important;color:#0B1730!important;border-color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureVehicleClassStart>div,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsurePolicyStart>div{border-top:4px solid #FFC21A!important;background-image:none!important;background-color:#FFFFFF!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureVehicleClassStart>div::before,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsurePolicyStart>div::before{background:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureVehicleCategoryTabs{background:#ECEEF2!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-category-tab{color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-category-tab[aria-selected=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-category-tab.active,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-category-tab.is-active{background:#0B1730!important;color:#FFC21A!important;border-color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-class-tab{color:#0B1730!important;border-color:#D5D9E0!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-class-tab[aria-pressed=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-class-tab[aria-selected=true],html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-class-tab.active,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-class-tab.selected,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-class-tab.is-selected{background:#FFF3C4!important;border-color:#FFC21A!important;box-shadow:inset 4px 0 0 #FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureVehicleClassHint{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureStartContinue{background:#FFC21A!important;color:#0B1730!important;box-shadow:0 6px 18px rgba(230,168,0,.4)!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureVehicleClassStart label{color:#5E6878!important}
+/* Fire gates */
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .gate-top{background:linear-gradient(120deg,#0B1730,#16264A)!important;border-bottom:3px solid #FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .gate-top p{color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .gate-btn-main,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #btn-start,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #btn-login{background:#FFC21A!important;color:#0B1730!important;border:0!important;font-weight:800!important;box-shadow:0 6px 18px rgba(230,168,0,.35)!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #toggle-pw{background:#0B1730!important;color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .back-link,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #lback,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #cback{background:transparent!important;color:#0B1730!important;border:1.5px solid #0B1730!important;text-decoration:none!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .choice-arrow{background:#FFF3C4!important;color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-choose b{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-choose span:not(.choice-arrow){color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-welcome h1{color:#0B1730!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #v-welcome p{color:#5E6878!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .gate-foot,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .gate-foot a{color:#5E6878!important}
+
+
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureWelcome::after{background:#FFF3C4!important;color:#0B1730!important;border-color:#FFC21A!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-class-tab[aria-selected=true]::after{background-color:#0B1730!important;border-color:#0B1730!important}
 </style>
