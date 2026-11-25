@@ -2892,9 +2892,7 @@ box-sizing:border-box;">
        font-size:18px;font-weight:700;cursor:pointer;">
         GET STARTED
     </button>
-
-
-
+    <div class="kw-foot">All rights reserved - Kota Kishore Kumar (<a href="https://kota112457.uii.ms" target="_blank" rel="noopener">Kota112457.uii.ms</a>)</div>
 </div>
 <!-- End K-INSURE Welcome Screen -->
 <!-- K-iNSURE Policy Type screen: shown immediately after Welcome -->
@@ -3685,7 +3683,13 @@ function motorCalc(id,i,R){
   }
   if(!od){basic=0;fixed=0;}
   const gvwLoad=(id==="lorry"&&gvw>12000&&od)?(gvw-12000)/100*27:0;
-  const gross=basic+gvwLoad, discAmt=gross*disc/100, afterDisc=gross-discAmt;
+  // v1.6.1: for commercial vehicles the electrical accessories premium (4% of value) is part of
+  // Own Damage before the tariff discount (and NCB), as in the insurer worksheet.
+  const efitRaw=(od&&i.addonActive?.efit)?Math.max(0,N(i.efit))*ADDON_RATES.electricalFittings/100:0;
+  const efitInOD=!["pc","epc","w2","e2w"].includes(id);
+  const efitOD=efitInOD?efitRaw:0;
+  const gross=basic+gvwLoad+efitOD, discAmt=gross*disc/100, afterDisc=gross-discAmt;
+  const afterDiscVehicle=(basic+gvwLoad)*(1-disc/100);
   const imt=(c.imt&&i.imt)?afterDisc*0.15:0;
   // Nil Depreciation is always rated on Basic Own Damage before tariff discount.
   // Vehicle-age rate and eligibility checks remain controlled by the existing rules.
@@ -3806,7 +3810,7 @@ function motorCalc(id,i,R){
   // Plus a fixed ₹60 third-party liability premium.
   const builtInCngCommercial=!["pc","epc","w2","e2w"].includes(id);
   const builtInCngRate=builtInCngCommercial?Number(ADDON_RATES.cngBuiltInODCommercial):Number(ADDON_RATES.cngBuiltInOD);
-  const builtInCngBase=builtInCngCommercial?afterDisc:basic;
+  const builtInCngBase=builtInCngCommercial?afterDiscVehicle:basic;
   const builtInCngOD=(od&&builtInCngLpg)?builtInCngBase*builtInCngRate/100:0;
   // A separately declared CNG/LPG kit may also be fitted to a Petrol/Diesel vehicle.
   // Preserve its existing kit-value OD rating; charge the ₹60 TP liability only once.
@@ -3815,7 +3819,7 @@ function motorCalc(id,i,R){
   const trailerOn=(id==="misc"&&!!i.trailer);
   const trailerOD=od&&trailerOn?Math.max(0,N(i.trailerIdv))*Math.max(0,N(i.trailerOdRate))/100:0;
   const trailerTP=tpOn&&trailerOn?Math.max(0,N(i.trailerTP)):0;
-  const efit=(od&&i.addonActive?.efit)?Math.max(0,N(i.efit))*ADDON_RATES.electricalFittings/100:0, rtc=(od&&i.addonActive?.rtax)?Math.max(0,N(i.rtax))*ADDON_RATES.roadTax/100:0;
+  const efit=efitInOD?0:efitRaw, rtc=(od&&i.addonActive?.rtax)?Math.max(0,N(i.rtax))*ADDON_RATES.roadTax/100:0;
   // Return-to-Invoice: user-supplied class schedule, calculated as a percentage of IDV.
   // Year bands use completed months: months 0–11 = Year 1, 12–23 = Year 2,
   // and 24–30 = Year 3. Eligibility ends at 30 completed months (2.5 years).
@@ -3872,7 +3876,7 @@ function motorCalc(id,i,R){
     ? roundedNetPremium+gOD+gTP
     : Math.round(netOD+extras+liability+gOD+gTP);
   if(!Number.isFinite(total)) throw new Error("Premium could not be calculated. Check the selected vehicle category and rate table.");
-  return {ndBase,ndGross,ndRenewalDiscount,ndClaimFreeEligible,basic,builtInCngLpg,builtInCngOD,builtInCngRate,builtInCngCommercial,fixed,rate,gvwLoad,gross,discAmt,afterDisc,imt,nd,odLoad,odLoadBase,rtiMonths,rtiBand,rtiRate,rtiPremium,enginePlatinumRate,enginePlatinum,enginePlatinumBand,ncbBase,ncbProtectRate,ncbProtect,evProtectRate,evProtect,emiProtectRate,emiProtect,keyProtectRate,keyProtect,keyProtectEligible,personalBelongingsRate,personalBelongings,platinumPASi,platinumPASeats,platinumPATerm,platinumPABase,platinumPA,tyreRimProtectRate,tyreRimProtect,tyreRimCarCover,tyreRimCarProtectRate,tyreRimCarProtect,tyreRimCarEligibleLong,consumablesProtectRate,consumablesProtect,consumablesLongTerm,ncbAmt,netOD,act,seatTP,pa,ltpa,ll,emp,nfpp,cng,cngOD,trailerOD,trailerTP,efit,rtc,man,extras,liability,gOD,gTP,total,split:!!c.split||id==="pc"};
+  return {efitOD,ndBase,ndGross,ndRenewalDiscount,ndClaimFreeEligible,basic,builtInCngLpg,builtInCngOD,builtInCngRate,builtInCngCommercial,fixed,rate,gvwLoad,gross,discAmt,afterDisc,imt,nd,odLoad,odLoadBase,rtiMonths,rtiBand,rtiRate,rtiPremium,enginePlatinumRate,enginePlatinum,enginePlatinumBand,ncbBase,ncbProtectRate,ncbProtect,evProtectRate,evProtect,emiProtectRate,emiProtect,keyProtectRate,keyProtect,keyProtectEligible,personalBelongingsRate,personalBelongings,platinumPASi,platinumPASeats,platinumPATerm,platinumPABase,platinumPA,tyreRimProtectRate,tyreRimProtect,tyreRimCarCover,tyreRimCarProtectRate,tyreRimCarProtect,tyreRimCarEligibleLong,consumablesProtectRate,consumablesProtect,consumablesLongTerm,ncbAmt,netOD,act,seatTP,pa,ltpa,ll,emp,nfpp,cng,cngOD,trailerOD,trailerTP,efit,rtc,man,extras,liability,gOD,gTP,total,split:!!c.split||id==="pc"};
 }
 //ENGINE-END
 //READERS-START
@@ -4239,6 +4243,7 @@ function lines(id,i,r){
   const c=R[id],pct=x=>(+x||0);
   const od=[],tp=[],tax=[],isOD=i.ptype==="od",isTP=i.ptype==="tp";
   od.push([id==="bus"?"Own damage (₹"+r.fixed+" + "+r.rate+"%)":"Own damage ("+r.rate+"%)",inr(r.basic)]);
+  if(r.efitOD>0)od.push(["Electrical accessories (4%)","+ "+inr(r.efitOD)]);
   // Weight loading remains included in OD calculation but is hidden from quotation breakdown.
   if(r.discAmt>0)od.push(["Tariff discount "+pct(i.disc)+"%","− "+inr(r.discAmt)]);
   if(r.imt>0)od.push(["IMT-23 cover (15%)","+ "+inr(r.imt)]);
@@ -4743,7 +4748,7 @@ function calc(){
   // Column 3: detailed, item-by-item premium computation with category subtotals.
   // The figures below are the same components used by motorCalc(); this is a
   // display-only breakdown and does not change the premium calculation.
-  const ownDamagePremium=Math.max(0,r.basic+r.gvwLoad-r.discAmt-r.ncbAmt);
+  const ownDamagePremium=Math.max(0,r.basic+r.gvwLoad+(r.efitOD||0)-r.discAmt-r.ncbAmt);
   const addonsPremium=Math.max(0,r.imt+r.nd+r.extras+r.ncbProtect+r.evProtect);
   const liabilityPremium=Math.max(0,r.liability);
   const totalNetPremium=ownDamagePremium+addonsPremium+liabilityPremium;
@@ -4760,6 +4765,7 @@ function calc(){
   };
   const ownDamageDetails=[
     [L.od[0]?.[0]||"Basic own damage premium",r.basic,"charge"],
+    ["Electrical accessories (4%)",r.efitOD||0,"charge"],
     ["Tariff discount ("+(Number(i.disc)||0)+"%)",r.discAmt,"deduction"],
     ["No Claim Bonus ("+(Number(r.ncbAmt)>0?(Number(i.ncb)||0):0)+"%)",r.ncbAmt,"deduction"]
   ];
@@ -8945,4 +8951,15 @@ html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .gate-foot,html:not(#z1):
 
 html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body #kinsureWelcome::after{background:#FFF3C4!important;color:#0B1730!important;border-color:#FFC21A!important}
 html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5) body .kinsure-class-tab[aria-selected=true]::after{background-color:#0B1730!important;border-color:#0B1730!important}
+
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6):not(#z7) body .kw-foot{margin-top:22px;padding-top:14px;border-top:1px solid #ECEEF2;font:600 12px/1.5 Inter,"Segoe UI",Arial,sans-serif;color:#5E6878;text-align:center}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6):not(#z7) body .kw-foot a{color:#0B1730;font-weight:700;text-decoration:underline;text-decoration-color:#FFC21A;text-underline-offset:2px}
+
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6):not(#z7) body #kinsureWelcome#kinsureWelcome{background:#7F7D7D!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6):not(#z7) body #kinsureWelcome#kinsureWelcome::before{height:500px!important;border:1px solid #D5D9E0!important;box-shadow:0 30px 60px rgba(0,0,0,.25)!important}
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6):not(#z7) body #kinsureWelcome#kinsureWelcome>.kw-foot{position:relative;z-index:1;width:min(440px,calc(100% - 80px));margin-top:26px!important}
+@media(max-width:520px){ html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6):not(#z7) body #kinsureWelcome#kinsureWelcome::before{height:520px!important} }
+
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6):not(#z7) body #kinsureWelcome#kinsureWelcome::before{height:470px!important}
+@media(max-width:520px){ html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6):not(#z7) body #kinsureWelcome#kinsureWelcome::before{height:480px!important} html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6):not(#z7) body #kinsureWelcome#kinsureWelcome>div:nth-of-type(1){font-size:1.6rem!important;white-space:nowrap!important} }
 </style>
