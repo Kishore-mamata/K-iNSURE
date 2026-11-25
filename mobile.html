@@ -1392,4 +1392,36 @@ html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6) body #placeholder .ki
 }
 
 </style>
+
+<script id="kinsure-user-role-hide">
+/* v1.6.4: In the User role, hide Tariff & Rates, Settings and What's new. Owner sees everything. */
+(function(){
+  function owner(){return typeof kinsureRole!=='undefined'&&kinsureRole==='owner';}
+  function targets(){
+    var list=[].slice.call(document.querySelectorAll('.nav button[data-page="Tariff & Rates"],.nav button[data-page="Settings"],.nav button[data-page="Whats New"]'));
+    document.querySelectorAll('.lower .workrow').forEach(function(r){if(/Tariff/.test(r.textContent))list.push(r);});
+    document.querySelectorAll('.m-links button').forEach(function(b){if(/Tariff|Settings|What/.test(b.textContent))list.push(b);});
+    return list;
+  }
+  function apply(){
+    var isOwner=owner();
+    document.body.classList.toggle('k-user-role',!isOwner);
+    targets().forEach(function(el){el.classList.add('k-owner-only');});
+    if(!isOwner){
+      var a=document.querySelector('.nav button.active');
+      var p=a&&a.getAttribute('data-page');
+      if(p==='Tariff & Rates'||p==='Settings'){try{showDashboard(document.querySelector('.nav button[data-page="Dashboard"]'));}catch(e){}}
+    }
+  }
+  var orig=window.updateRoleUI||updateRoleUI;
+  window.updateRoleUI=updateRoleUI=function(){var r=orig.apply(this,arguments);apply();return r;};
+  /* Guard direct calls too */
+  var gp=window.showPlaceholder;
+  if(gp)window.showPlaceholder=showPlaceholder=function(name){if(!owner()&&(name==='Tariff & Rates'||name==='Settings'))return false;return gp.apply(this,arguments);};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply);else apply();
+})();
+</script>
+<style id="kinsure-user-role-hide-style">
+html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6) body.k-user-role .k-owner-only,html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6) body.k-user-role .app>aside.sidebar nav.nav>button.k-owner-only{display:none!important}
+</style>
 </body></html>
