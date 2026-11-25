@@ -1398,9 +1398,9 @@ html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6) body #placeholder .ki
 (function(){
   function owner(){return typeof kinsureRole!=='undefined'&&kinsureRole==='owner';}
   function targets(){
-    var list=[].slice.call(document.querySelectorAll('.nav button[data-page="Tariff & Rates"],.nav button[data-page="Settings"],.nav button[data-page="Whats New"],.nav button[data-page="Incentives"]'));
-    document.querySelectorAll('.lower .workrow').forEach(function(r){if(/Tariff/.test(r.textContent))list.push(r);});
-    document.querySelectorAll('.m-links button').forEach(function(b){if(/Tariff|Settings|What|Incentive/.test(b.textContent))list.push(b);});
+    var list=[].slice.call(document.querySelectorAll('.nav button[data-page="Tariff & Rates"],.nav button[data-page="Settings"],.nav button[data-page="Whats New"],.nav button[data-page="Quotations"]'));
+    document.querySelectorAll('.lower .workrow').forEach(function(r){if(/Tariff|Quotations/.test(r.textContent))list.push(r);});
+    document.querySelectorAll('.m-links button').forEach(function(b){if(/Tariff|Settings|What|quotation/i.test(b.textContent))list.push(b);});
     return list;
   }
   function apply(){
@@ -1410,16 +1410,16 @@ html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6) body #placeholder .ki
     if(!isOwner){
       var a=document.querySelector('.nav button.active');
       var p=a&&a.getAttribute('data-page');
-      if(p==='Tariff & Rates'||p==='Settings'||p==='Incentives'){try{showDashboard(document.querySelector('.nav button[data-page="Dashboard"]'));}catch(e){}}
+      if(p==='Tariff & Rates'||p==='Settings'||p==='Quotations'){try{showDashboard(document.querySelector('.nav button[data-page="Dashboard"]'));}catch(e){}}
     }
   }
   var orig=window.updateRoleUI||updateRoleUI;
   window.updateRoleUI=updateRoleUI=function(){var r=orig.apply(this,arguments);apply();return r;};
   /* Guard direct calls too */
   var gp=window.showPlaceholder;
-  if(gp)window.showPlaceholder=showPlaceholder=function(name){if(!owner()&&(name==='Tariff & Rates'||name==='Settings'))return false;return gp.apply(this,arguments);};
-  var ki=window.kinsureIncentives;
-  if(ki)window.kinsureIncentives=function(){if(!owner()){alert('Incentives is available to the OWNER only. Choose OWNER from the User / Owner selector and enter the Owner password.');return false;}return ki.apply(this,arguments);};
+  if(gp)window.showPlaceholder=showPlaceholder=function(name){if(!owner()&&(name==='Tariff & Rates'||name==='Settings'||name==='Quotations'))return false;return gp.apply(this,arguments);};
+  var kq=window.kinsureShowQuotations;
+  if(kq)window.kinsureShowQuotations=function(){if(!owner())return false;return kq.apply(this,arguments);};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',apply);else apply();
 })();
 </script>
