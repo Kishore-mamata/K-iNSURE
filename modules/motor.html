@@ -3345,7 +3345,7 @@ body{padding-block:8px 10px}
 <div><label for="efit">Electrical fittings value (₹)</label><input id="efit" inputmode="numeric" min="0" step="1000" type="number" value="0"/></div>
 <div><label for="cng">CNG / LPG kit value (₹)</label><input id="cng" inputmode="numeric" min="0" step="1000" type="number" value="0"/><label class="chk" style="margin-top:6px"><input id="cngFactoryFitted" type="checkbox"/> Factory-fitted kit (no separate OD kit premium)</label></div>
 </div>
-<div class="hint">Select Consumables Add-on to calculate the supplied age/vehicle-class IDV rate automatically. Loss of Key is rated separately using the supplied vehicle-class and policy-term schedule. Road tax cover uses 1.67% of road tax paid; electrical fittings use 4% of declared value; Select Built in CNG/LPG, or choose CNG/LPG as the fuel type, to apply 2% of Basic Own Damage before discount and ₹60 third-party liability. Tick CNG/LPG Kit to insure the kit under OD at 4% of its declared value; waived for factory-fitted kits as configured. Confirm applicable insurer tariff.</div>
+<div class="hint">Select Consumables Add-on to calculate the supplied age/vehicle-class IDV rate automatically. Loss of Key is rated separately using the supplied vehicle-class and policy-term schedule. Road tax cover uses 1.67% of road tax paid; electrical fittings use 4% of declared value; Select Built in CNG/LPG, or choose CNG/LPG as the fuel type, to apply 5% of Own Damage after discount and ₹60 third-party liability per year of TP cover. Tick CNG/LPG Kit to insure the kit under OD at 4% of its declared value; waived for factory-fitted kits as configured. Confirm applicable insurer tariff.</div>
 </details><div class="nd-panel">
 <label class="chk nd-toggle"><input id="ndEnabled" type="checkbox"/> Apply Nil Depreciation Cover</label>
 <div class="row">
@@ -3813,11 +3813,13 @@ function motorCalc(id,i,R){
   // Plus a fixed ₹60 third-party liability premium.
   const builtInCngCommercial=!["pc","epc","w2","e2w"].includes(id);
   const builtInCngRate=builtInCngCommercial?Number(ADDON_RATES.cngBuiltInODCommercial):Number(ADDON_RATES.cngBuiltInOD);
-  const builtInCngBase=builtInCngCommercial?afterDiscVehicle:basic;
+  // v1.6.13: Private car / two-wheeler also 5% of OD after tariff discount (matches UIIC bundled PC quotation).
+  const builtInCngBase=afterDiscVehicle;
   const builtInCngOD=(od&&builtInCngLpg)?builtInCngBase*builtInCngRate/100:0;
   // A separately declared CNG/LPG kit may also be fitted to a Petrol/Diesel vehicle.
   // Preserve its existing kit-value OD rating; charge the ₹60 TP liability only once.
-  const cng=(tpOn&&(builtInCngLpg||cngKit>0))?ADDON_RATES.cngTP:0;
+  // v1.6.13: ₹60 CNG/LPG TP liability is charged for each year of TP cover (e.g. ₹180 for 3-year TP).
+  const cng=(tpOn&&(builtInCngLpg||cngKit>0))?ADDON_RATES.cngTP*selectedPolicyTerm:0;
   const cngOD=(od&&cngKit>0&&i.addonActive?.cng&&!i.cngFactoryFitted)?cngKit*ADDON_RATES.cngKitOD/100:0;
   const trailerOn=(id==="misc"&&!!i.trailer);
   const trailerOD=od&&trailerOn?Math.max(0,N(i.trailerIdv))*Math.max(0,N(i.trailerOdRate))/100:0;
@@ -4169,7 +4171,7 @@ const ADDON_DEFAULTS={
   enginePlatinumPrivateCar:[0.13,0.16,0.21,0.27,0.32],
   enginePlatinumPassengerCommercial:[0.15,0.20,0.26,0,0],
   rsa:50,towing:75,medical50000:250,medical100000:325,personalEffects5000Fixed:250,personalEffects10000Fixed:500,
-  cngBuiltInOD:2,cngBuiltInODCommercial:5,cngKitOD:4,cngTP:60,electricalFittings:4,roadTax:1.67,imt23Loading:15,
+  cngBuiltInOD:5,cngBuiltInODCommercial:5,cngKitOD:4,cngTP:60,electricalFittings:4,roadTax:1.67,imt23Loading:15,
   cpaOwnerDriver:{1:325,3:839,5:1316},legalLiabilityDriver:50,ltpa:1300,employeeLiabilityPerPerson:50,nfppPerPerson:75
 };
 const ADDON_RATES=(()=>{let v=JSON.parse(lsGet("mc_addon_rates")||"null");return v&&typeof v==="object"?mergeAddon(ADDON_DEFAULTS,v):JSON.parse(JSON.stringify(ADDON_DEFAULTS));})();
@@ -4270,7 +4272,7 @@ function lines(id,i,r){
   if(r.ncbAmt>0)od.push(["No claim bonus "+pct(i.ncb)+"%","− "+inr(r.ncbAmt)]);
   od.push(["Net own damage",inr(r.netOD),"strong"]);
   if(r.efit>0)od.push(["Electrical fittings (4%)","+ "+inr(r.efit)]);
-  if(r.builtInCngOD>0)od.push(["Built in CNG/LPG premium ("+(+Number(r.builtInCngRate).toFixed(3))+"% of "+(r.builtInCngCommercial?"Own Damage after discount":"Basic Own Damage before discount")+")","+ "+inr(r.builtInCngOD)]);
+  if(r.builtInCngOD>0)od.push(["Built in CNG/LPG premium ("+(+Number(r.builtInCngRate).toFixed(3))+"% of "+"Own Damage after discount"+")","+ "+inr(r.builtInCngOD)]);
   if(r.cngOD>0)od.push(["Separately declared CNG / LPG kit OD premium (4% of kit value)","+ "+inr(r.cngOD)]);
   if(r.trailerOD>0)od.push(["Trailer own-damage premium","+ "+inr(r.trailerOD)]);
   if(r.rtc>0)od.push(["Road tax cover (1.67%)","+ "+inr(r.rtc)]);
@@ -4281,7 +4283,7 @@ function lines(id,i,r){
   if(r.seatTP>0)tp.push([id==="w2"&&String(i.vehicleType||"")==="New"?`PA Cover for Unnamed Persons (${Number(i.cpaTenure)||1} year${Number(i.cpaTenure)===1?"":"s"})`:id==="w2"?"PA to Passengers":(R[id].paSeat)?"PA cover for occupants":["taxi","etaxi"].includes(id)?"Liability to passengers":"Passenger liability",inr(r.seatTP)]);
   if(r.pa>0)tp.push(["CPA cover, owner-driver (revised term premium)",inr(r.pa)]);
   if(r.ltpa>0)tp.push(["Long-term PA, owner-driver",inr(r.ltpa)]);
-  if(r.cng>0)tp.push(["Built in CNG/LPG liability (fixed ₹60)",inr(r.cng)]);
+  if(r.cng>0)tp.push(["Built in CNG/LPG liability (₹60"+(r.cng>60?" × "+Math.round(r.cng/60)+" years":"")+")",inr(r.cng)]);
   if(r.trailerTP>0)tp.push(["Trailer third-party premium",inr(r.trailerTP)]);
   if(r.ll>0)tp.push(["Legal liability to driver",inr(r.ll)]);
   if(r.emp>0)tp.push(["Liability to employees",inr(r.emp)]);
@@ -4782,7 +4784,7 @@ function calc(){
     ["NCB Protect",r.ncbProtect],
     ["Electric Vehicle Protect",r.evProtect],
     ["Electrical fittings",r.efit],
-    ["Built in CNG/LPG — Own Damage ("+(+Number(r.builtInCngRate).toFixed(3))+"% of "+(r.builtInCngCommercial?"OD after discount":"Basic OD before discount")+")",r.builtInCngOD],
+    ["Built in CNG/LPG — Own Damage ("+(+Number(r.builtInCngRate).toFixed(3))+"% of "+"OD after discount"+")",r.builtInCngOD],
     ["CNG / LPG kit — Own Damage",r.cngOD],
     ["Trailer — Own Damage",r.trailerOD],
     ["Road Tax Cover",r.rtc],
@@ -5224,7 +5226,7 @@ function renderAddonRates(){
     "personalEffects10000Fixed":"Personal Effects — ₹10,000 cover",
     "electricalFittings":"Electrical fittings (% of value)",
     "roadTax":"Road Tax Cover (% of value)",
-    "cngBuiltInOD":"Built-in CNG/LPG Own Damage (% of Basic OD)",
+    "cngBuiltInOD":"Built-in CNG/LPG Own Damage — private car / two-wheeler (% of OD after discount)",
     "cngBuiltInODCommercial":"Built-in CNG/LPG Own Damage — commercial (% of OD after discount)",
     "cngKitOD":"Declared CNG/LPG kit Own Damage (% of kit value)",
     "cngTP":"CNG/LPG Third Party fixed premium",
