@@ -3838,6 +3838,9 @@ function motorCalc(id,i,R){
   // v1.4.4: NCB also applies to Return to Invoice premium (matches insurer quotation).
   const ncbOnRti=rtiPremium*effectiveNcb/100;
   ncbBase+=rtiPremium; ncbAmt+=ncbOnRti; netOD-=ncbOnRti;
+  // v1.6.12: for commercial vehicles NCB also applies to the built-in CNG/LPG OD loading (matches UIIC Taxi quotation).
+  const ncbOnCng=builtInCngCommercial?builtInCngOD*effectiveNcb/100:0;
+  ncbBase+=ncbOnCng; ncbAmt+=ncbOnCng; netOD-=ncbOnCng;
   const man={};let manSum=0;
   // v1.4.7: Engine Protection covers are not available for Electric Vehicles.
   const kNoEngineEV=K_EV_CLASSES.includes(id);
@@ -3861,7 +3864,8 @@ function motorCalc(id,i,R){
   const extras=efit+rtc+builtInCngOD+cngOD+trailerOD+manSum+keyProtect+personalBelongings+platinumPA+tyreRimProtect+tyreRimCarProtect+consumablesProtect+emiProtect+enginePlatinum;
   const liability=act+seatTP+pa+ltpa+ll+emp+nfpp+cng+trailerTP;
   let gOD,gTP=0;
-  if(id==="pc"){
+  if(id==="pc"||id==="taxi"||id==="etaxi"){
+    // v1.6.12: Taxi also uses CGST + SGST rounded separately (matches UIIC Taxi quotation).
     // Private-car quote: split the entered GST rate equally into CGST and SGST,
     // each applied to the full net premium (OD + add-ons + TP liabilities).
     const fullTaxBase=netOD+extras+liability;
@@ -3875,7 +3879,7 @@ function motorCalc(id,i,R){
     gOD=(netOD+extras+liability)*gst/100;
   }
   const roundedNetPremium=Math.round(netOD+extras+liability);
-  const total=(id==="pc"||c.split)
+  const total=(id==="pc"||id==="taxi"||id==="etaxi"||c.split)
     ? roundedNetPremium+gOD+gTP
     : Math.round(netOD+extras+liability+gOD+gTP);
   if(!Number.isFinite(total)) throw new Error("Premium could not be calculated. Check the selected vehicle category and rate table.");
@@ -4284,7 +4288,7 @@ function lines(id,i,r){
   if(r.nfpp>0)tp.push(["Non-fare paying passengers",inr(r.nfpp)]);
   tp.push(["Total liability",inr(r.liability),"strong"]);
   const gstRate=Math.max(0,pct(i.gst)),gstActRate=Math.max(0,pct(i.gstt));
-  if(id==="pc"){
+  if(id==="pc"||id==="taxi"||id==="etaxi"){
     const halfRate=gstRate/2;
     tax.push([`CGST (${halfRate}% on net premium)`,inr(r.gOD)]);
     tax.push([`SGST (${halfRate}% on net premium)`,inr(r.gTP)]);
@@ -4811,7 +4815,7 @@ function calc(){
   ];
   const gst=Math.max(0,+i.gst||0),gstt=Math.max(0,+i.gstt||0);
   const gstRateLabel=(value)=>`${Number(value||0).toFixed(2).replace(/\.?0+$/,"")}%`;
-  const taxDetails=cls==="pc"?
+  const taxDetails=(cls==="pc"||cls==="taxi"||cls==="etaxi")?
     [["CGST ("+gstRateLabel(gst/2)+")",r.gOD],["SGST ("+gstRateLabel(gst/2)+")",r.gTP]]:
     (r.split?[["GST on Own Damage and Covers ("+gstRateLabel(gst)+")",r.gOD],["GST on Act Premium ("+gstRateLabel(gstt)+")",r.gTP]]:[["GST ("+gstRateLabel(gst)+")",r.gOD]]);
   const taxRows=taxDetails.filter(x=>Math.abs(Number(x[1])||0)>0.000001).map(x=>detailRow(x[0],x[1])).join("")||
