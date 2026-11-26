@@ -183,7 +183,7 @@ h1,.panel h3{color:#17345d!important}
     <button data-page="Fire Calculator" onclick="openModule('fire.html',this)"><span class="ico">🔥</span><span class="txt">Fire Calculator</span></button>
     <button data-page="Health Calculator" onclick="openModule('health.html',this)"><span class="ico">🩺</span><span class="txt">Health Calculator</span></button>
     <button data-page="Quotations" onclick="showPlaceholder('Quotations',this)"><span class="ico">▤</span><span class="txt">Quotations</span></button>
-    <button data-page="Incentives" onclick="kinsureIncentives(this)"><span class="ico">💰</span><span class="txt">Incentives</span></button>
+    <button data-page="Incentives" onclick="kinsureIncentives(this)"><span class="ico">💰</span><span class="txt">Remuneration</span></button>
     <button data-page="Tariff & Rates" onclick="showPlaceholder('Tariff & Rates',this)"><span class="ico">▱</span><span class="txt">Tariff &amp; Rates</span></button>
     <button data-page="Settings" onclick="showPlaceholder('Settings',this)"><span class="ico">⚙</span><span class="txt">Settings</span></button>
     <button data-page="Whats New" onclick="location.href='whats-new.html'"><span class="ico">★</span><span class="txt">What's new</span></button>
@@ -810,7 +810,7 @@ body.m-mode.m-welcome #mWelcome{display:flex}
     <button type="button" class="m-card health" onclick="kmOpen('health.html')"><span class="m-ico">🩺</span><span><b>Health Insurance</b><small>IHP · Family Medicare · Super Top-Up · Yuvaan</small></span><span class="m-go">→</span></button>
   </div>
   <div class="m-links">
-    <button type="button" onclick="kmPage('Incentives')">💰 Incentives</button>
+    <button type="button" onclick="kmPage('Incentives')">💰 Remuneration</button>
     <button type="button" onclick="kmPage('Quotations')">Saved quotations</button>
     <button type="button" onclick="kmPage('Tariff & Rates')">Tariff &amp; Rates</button>
     <button type="button" onclick="kmPage('Settings')">Settings</button>
@@ -826,7 +826,7 @@ body.m-mode.m-welcome #mWelcome{display:flex}
   var logo=document.querySelector('.brand-logo');
   if(logo){document.getElementById('mLogo').src=logo.src;document.getElementById('mBarLogo').src=logo.src;}
   function inMobile(){return body.classList.contains('m-mode');}
-  function setTitle(t){document.getElementById('mBarTitle').textContent=t;}
+  function setTitle(t){if(t==='Incentives')t='Remuneration';document.getElementById('mBarTitle').textContent=t;}
   function showWelcome(){body.classList.add('m-welcome');try{showDashboard();}catch(e){}window.scrollTo(0,0);}
   function leaveWelcome(){if(body.classList.contains('m-welcome')){body.classList.remove('m-welcome');try{history.pushState({km:1},'');}catch(e){}}}
   window.kmOpen=function(file){setTitle(file==='motor.html'?'Motor Insurance':file==='health.html'?'Health Insurance':'Fire Insurance');leaveWelcome();openModule(file);};
@@ -1299,7 +1299,7 @@ html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6) body #placeholder .ki
     var content=st.sec==="rules"?rulesSection():st.sec==="agents"?agentsSection():["fire","ifire","eng","ieng","mh"].indexOf(st.sec)>=0?listTable(st.sec):motorSection(st.sec);
     var sub=st.mode==="com"?"UIIC commission · Motor from 26.10.2026 · Fire, Engineering &amp; Marine Hull":"UIIC incentive · Fire &amp; Engineering · Agents' additional commission";
     p.innerHTML='<div class="ki-wrap">'+
-      '<div class="ki-hero"><div class="ki-ico">💰</div><div><h1>Incentives</h1><div class="ki-sub">'+sub+'</div></div></div>'+
+      '<div class="ki-hero"><div class="ki-ico">💰</div><div><h1>Remuneration</h1><div class="ki-sub">'+sub+'</div></div></div>'+
       modes+
       '<div class="ki-bar">'+
         (isMotor?'<label class="ki-f"><span>Vehicle registered in</span><select id="kiState">'+opts+'</select></label>':'')+
