@@ -1010,7 +1010,7 @@ body.m-mode.m-welcome #mWelcome{display:flex}
 
 <!-- ===== v1.4.3: trial version - hide extra buttons in the installed app for Users ===== -->
 <style id="kinsure-installed-trial">
-html.k-installed:not(.k-owner) #mWelcome .m-links{display:none!important}
+html.k-installed:not(.k-owner) #mWelcome .m-links button:not([onclick*="Incentives"]){display:none!important}
 </style>
 <script id="kinsure-installed-trial-script">
 (function(){
