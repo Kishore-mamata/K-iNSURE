@@ -3685,6 +3685,7 @@ function motorCalc(id,i,R){
     }
   }
   if(!od){basic=0;fixed=0;}
+  // Rs.27 per 100 kg of GVW in excess of 12,000 kg, charged proportionately (matches UIIC quote: 12,150 kg → ₹40.50).
   const gvwLoad=(id==="lorry"&&gvw>12000&&od)?(gvw-12000)/100*27:0;
   // v1.6.1: for commercial vehicles the electrical accessories premium (4% of value) is part of
   // Own Damage before the tariff discount (and NCB), as in the insurer worksheet.
@@ -4251,9 +4252,10 @@ function collect(){
 function lines(id,i,r){
   const c=R[id],pct=x=>(+x||0);
   const od=[],tp=[],tax=[],isOD=i.ptype==="od",isTP=i.ptype==="tp";
-  od.push([id==="bus"?"Own damage (₹"+r.fixed+" + "+r.rate+"%)":"Own damage ("+r.rate+"%)",inr(r.basic)]);
+  od.push([id==="bus"?"Own damage (₹"+r.fixed+" + "+r.rate+"%)":"Own damage ("+r.rate+"%)",inr(r.basic+(r.gvwLoad||0))]);
   if(r.efitOD>0)od.push(["Electrical accessories (4%)","+ "+inr(r.efitOD)]);
-  // Weight loading remains included in OD calculation but is hidden from quotation breakdown.
+  // v1.6.16: Goods Lorry weight loading (₹27 per 100 kg above 12,000 kg) is merged into the Own damage line,
+  // as in the insurer quotation, so Net OD (A) and Net Premium (A+B) include it.
   if(r.discAmt>0)od.push(["Tariff discount "+pct(i.disc)+"%","− "+inr(r.discAmt)]);
   if(r.imt>0)od.push(["IMT-23 cover (15%)","+ "+inr(r.imt)]);
   if(r.ndGross>0){

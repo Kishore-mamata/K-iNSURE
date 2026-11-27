@@ -730,14 +730,14 @@ a{color:#087f83}
     </div>
     <div class="gate-body">
       <div class="login-form">
-        <div>
+        <div hidden>
           <label for="login-id">Owner ID</label>
-          <input id="login-id" type="text" placeholder="Enter Owner ID" autocomplete="username">
+          <input id="login-id" type="text" autocomplete="username" tabindex="-1">
         </div>
         <div>
-          <label for="login-pw">Password / PIN</label>
+          <label for="login-pw">Owner password</label>
           <div class="pw-wrap">
-            <input id="login-pw" type="password" placeholder="Enter Password" autocomplete="current-password">
+            <input id="login-pw" type="password" placeholder="Same Owner password as the main app" autocomplete="current-password">
             <button type="button" class="pw-eye" id="toggle-pw">Show</button>
           </div>
         </div>
@@ -924,14 +924,17 @@ a{color:#087f83}
     </div>
 
     <div class="setc">
-      <h3>Owner's Login settings</h3>
+      <h3>Change Owner password</h3>
       <div class="row">
-        <div><label for="set-oid">New Owner ID</label><input id="set-oid" type="text" placeholder="e.g. Kishore"></div>
-        <div><label for="set-opw">New Password</label><input id="set-opw" type="password" placeholder="Enter new PIN/Pass"></div>
+        <div><label for="set-oid">Current password</label><input id="set-oid" type="password" autocomplete="current-password" placeholder="Current Owner password"></div>
+        <div><label for="set-opw">New password</label><input id="set-opw" type="password" autocomplete="new-password" placeholder="At least 8 characters"></div>
       </div>
-      <button type="button" class="btn primary" id="btn-save-auth">Save Login</button>
+      <div class="row">
+        <div><label for="set-opw2">Confirm new password</label><input id="set-opw2" type="password" autocomplete="new-password" placeholder="Type the new password again"></div>
+      </div>
+      <button type="button" class="btn primary" id="btn-save-auth">Change password</button>
       <div class="status" id="authstat" role="status"></div>
-      <div class="hint">Change your Owner ID &amp; Password anytime on this device.</div>
+      <div class="hint">One Owner password for the whole K-iNSURE app on this device. Changing it here also changes it for Motor, Settings and Owner sign-in.</div>
     </div>
 
     <div class="setc">
@@ -1036,9 +1039,10 @@ a{color:#087f83}
 </div>
 
 <script>
-//DEFAULT OWNER LOGIN (Change here if you want a different starting login)
-const DEFAULT_OWNER_ID="Kishore";
-const DEFAULT_OWNER_PASS="1234";
+// v1.6.16: no built-in Owner login. Fire uses the same Owner password as the main K-iNSURE app.
+const KINSURE_OWNER_HASH_KEY="kinsure_suite_owner_hash_v1";
+function kinsureHash(text){let h=2166136261;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0).toString(16);}
+try{localStorage.removeItem("fpc_auth");}catch(e){}
 
 //READERS-START
 const U16=(d,o)=>d[o]|(d[o+1]<<8);
@@ -1294,13 +1298,7 @@ function simpleHash(s){
   h2=Math.imul(h2^(h2>>>16),2246822507)^Math.imul(h1^(h1>>>13),3266489909);
   return (4294967296*(2097151&h2)+(h1>>>0)).toString(36);
 }
-function getOwnerAuth(){
-  try{
-    const a=JSON.parse(lsGet("fpc_auth")||"null");
-    if(a&&a.id&&a.hash) return a;
-  }catch(e){}
-  return {id:DEFAULT_OWNER_ID, hash:simpleHash(DEFAULT_OWNER_PASS)};
-}
+function getOwnerHash(){return lsGet(KINSURE_OWNER_HASH_KEY);}
 function syncLockUI(){
   RATE_INPUTS.forEach(id=>{$(id).readOnly=!OWNER_UNLOCKED;});
   $("modify-zone").classList.toggle("locked-zone",!OWNER_UNLOCKED);
@@ -1344,20 +1342,23 @@ function openOwnerLogin(fromWhere){
   showScreen("v-login");
 }
 function tryLogin(){
-  const uid=$("login-id").value.trim(), pw=$("login-pw").value;
-  const auth=getOwnerAuth();
-  if(uid.toLowerCase()===auth.id.toLowerCase() && simpleHash(pw)===auth.hash){
+  const pw=$("login-pw").value, saved=getOwnerHash();
+  if(!saved){
+    OWNER_UNLOCKED=false;
+    $("login-err").textContent="No Owner password yet. Create one first from the main app: choose Owner sign-in.";
+    return;
+  }
+  if(pw && kinsureHash(pw)===saved){
     OWNER_UNLOCKED=true;
     $("login-err").textContent="";
     $("login-pw").value="";
-    $("set-oid").value=auth.id;
     syncLockUI();
     showScreen("main");
     showTab(tab);
     say("Owner login successful. You can now modify rates and settings.");
   }else{
     OWNER_UNLOCKED=false;
-    $("login-err").textContent="Incorrect Owner ID or Password.";
+    $("login-err").textContent="Incorrect Owner password.";
     $("login-pw").focus();
   }
 }
@@ -1366,6 +1367,12 @@ function lockRates(){
   syncLockUI();
   say("Rates locked. Others cannot modify.");
 }
+// v1.6.16: when the main app is signed in as Owner, Fire is unlocked too; switching to User locks it.
+window.addEventListener("message",ev=>{
+  if(!ev.data||ev.data.type!=="kinsure-role-update")return;
+  OWNER_UNLOCKED=ev.data.role==="owner";
+  syncLockUI();
+});
 $("toggle-pw").addEventListener("click",()=>{
   const inp=$("login-pw"), show=inp.type==="password";
   inp.type=show?"text":"password";
@@ -1386,20 +1393,22 @@ $("btn-lock").addEventListener("click",lockRates);
 
 $("btn-save-auth").addEventListener("click",()=>{
   if(!OWNER_UNLOCKED){showConditionsTab();return;}
-  const nid=$("set-oid").value.trim(), npw=$("set-opw").value;
-  if(!nid||!npw){stat("authstat","Enter both a new Owner ID and Password.",true);return;}
+  const cur=$("set-oid").value, npw=$("set-opw").value, npw2=$("set-opw2").value, saved=getOwnerHash();
+  if(!saved||kinsureHash(cur)!==saved){stat("authstat","Current password is incorrect. Nothing changed.",true);return;}
+  if(npw.trim().length<8){stat("authstat","New password must have at least 8 characters.",true);return;}
+  if(npw!==npw2){stat("authstat","New passwords do not match. Nothing changed.",true);return;}
   try{
-    lsSet("fpc_auth",JSON.stringify({id:nid,hash:simpleHash(npw)}));
-    $("set-opw").value="";
-    stat("authstat","Owner login updated! Next login will use ID: "+nid);
-  }catch(e){stat("authstat","Could not save login settings.",true);}
+    localStorage.setItem(KINSURE_OWNER_HASH_KEY,kinsureHash(npw));
+    ["set-oid","set-opw","set-opw2"].forEach(id=>$(id).value="");
+    stat("authstat","Owner password changed for the whole app on this device.");
+  }catch(e){stat("authstat","Could not save the new password.",true);}
 });
 
 /* ---- Screen switching (NO forced login redirect) ---- */
 function showScreen(id){
   ["v-welcome","v-choose","v-login","main","prev"].forEach(s=>$(s).hidden=(s!==id));
   if(id==="v-login"){
-    setTimeout(()=>$("login-id").focus(),40);
+    setTimeout(()=>$("login-pw").focus(),40);
   }
   window.scrollTo(0,0);
 }
