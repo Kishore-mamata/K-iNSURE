@@ -775,10 +775,10 @@ a{color:#087f83}
   <div class="perm-ico" aria-hidden="true">🔒</div>
   <h2 id="perm-title">Permission Denied</h2>
   <div class="cond-msg" id="perm-msg">Others cannot modify.</div>
-  <p class="perm-sub">Only the Owner can change rates and settings.</p>
+  <p class="perm-sub">Rates and settings can be changed by the app owner only.</p>
   <div class="cond-acts">
     <button type="button" class="btn primary" id="cond-back">OK</button>
-    <button type="button" class="btn" id="cond-owner">Owner Login</button>
+    <button type="button" class="btn" id="cond-owner" hidden>Owner Login</button>
   </div>
  </div>
 </section>
@@ -907,9 +907,9 @@ a{color:#087f83}
   <summary>Logo, color theme, Excel rates &amp; saved quotations</summary>
 
   <div class="owner-bar">
-    <strong id="owner-badge" style="font-size:.88rem">🔒 Rates Locked (Owner Login required to modify)</strong>
+    <strong id="owner-badge" style="font-size:.88rem">🔒 Rates Locked</strong>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button type="button" class="btn primary" id="btn-owner-open">Owner Login</button>
+      <button type="button" class="btn primary" id="btn-owner-open">Unlock Rates</button>
       <button type="button" class="btn" id="btn-owner-lock" hidden>Lock Rates</button>
     </div>
   </div>
@@ -924,17 +924,8 @@ a{color:#087f83}
     </div>
 
     <div class="setc">
-      <h3>Change Owner password</h3>
-      <div class="row">
-        <div><label for="set-oid">Current password</label><input id="set-oid" type="password" autocomplete="current-password" placeholder="Current Owner password"></div>
-        <div><label for="set-opw">New password</label><input id="set-opw" type="password" autocomplete="new-password" placeholder="At least 8 characters"></div>
-      </div>
-      <div class="row">
-        <div><label for="set-opw2">Confirm new password</label><input id="set-opw2" type="password" autocomplete="new-password" placeholder="Type the new password again"></div>
-      </div>
-      <button type="button" class="btn primary" id="btn-save-auth">Change password</button>
-      <div class="status" id="authstat" role="status"></div>
-      <div class="hint">One Owner password for the whole K-iNSURE app on this device. Changing it here also changes it for Motor, Settings and Owner sign-in.</div>
+      <h3>Owner password</h3>
+      <div class="hint">The Owner password is managed in the main K-iNSURE app (Settings → Change Owner password).</div>
     </div>
 
     <div class="setc">
@@ -1307,7 +1298,7 @@ function syncLockUI(){
   $("btn-owner-lock").hidden=!OWNER_UNLOCKED;
   $("owner-badge").textContent=OWNER_UNLOCKED
     ?"🔓 Owner Logged In (Rates & Settings Editable)"
-    :"🔒 Rates Locked (Owner Login required to modify)";
+    :"🔒 Rates Locked";
 }
 // v1.4.5: show a "Permission Denied" pop-up over the calculator (calculator stays visible behind it)
 function showConditionsTab(){
@@ -1335,7 +1326,11 @@ $("trchips").addEventListener("click",guardRateAttempt,true);
   $("modify-zone").addEventListener(ev,guardRateAttempt,true);
 });
 
+let KINSURE_MAIN_ROLE="user";
 function openOwnerLogin(fromWhere){
+  // v1.6.16: no separate Fire login. Unlocks only when the main app is signed in as Owner.
+  if(KINSURE_MAIN_ROLE==="owner"){OWNER_UNLOCKED=true;syncLockUI();closePermPopup();say("Rates unlocked.");return;}
+  showConditionsTab();return;
   LOGIN_RETURN=fromWhere||"main";
   $("login-err").textContent="";
   $("login-pw").value="";
@@ -1370,7 +1365,8 @@ function lockRates(){
 // v1.6.16: when the main app is signed in as Owner, Fire is unlocked too; switching to User locks it.
 window.addEventListener("message",ev=>{
   if(!ev.data||ev.data.type!=="kinsure-role-update")return;
-  OWNER_UNLOCKED=ev.data.role==="owner";
+  KINSURE_MAIN_ROLE=ev.data.role==="owner"?"owner":"user";
+  OWNER_UNLOCKED=KINSURE_MAIN_ROLE==="owner";
   syncLockUI();
 });
 $("toggle-pw").addEventListener("click",()=>{
@@ -1391,18 +1387,6 @@ $("btn-owner-open").addEventListener("click",()=>openOwnerLogin("main"));
 $("btn-owner-lock").addEventListener("click",lockRates);
 $("btn-lock").addEventListener("click",lockRates);
 
-$("btn-save-auth").addEventListener("click",()=>{
-  if(!OWNER_UNLOCKED){showConditionsTab();return;}
-  const cur=$("set-oid").value, npw=$("set-opw").value, npw2=$("set-opw2").value, saved=getOwnerHash();
-  if(!saved||kinsureHash(cur)!==saved){stat("authstat","Current password is incorrect. Nothing changed.",true);return;}
-  if(npw.trim().length<8){stat("authstat","New password must have at least 8 characters.",true);return;}
-  if(npw!==npw2){stat("authstat","New passwords do not match. Nothing changed.",true);return;}
-  try{
-    localStorage.setItem(KINSURE_OWNER_HASH_KEY,kinsureHash(npw));
-    ["set-oid","set-opw","set-opw2"].forEach(id=>$(id).value="");
-    stat("authstat","Owner password changed for the whole app on this device.");
-  }catch(e){stat("authstat","Could not save the new password.",true);}
-});
 
 /* ---- Screen switching (NO forced login redirect) ---- */
 function showScreen(id){
