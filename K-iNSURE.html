@@ -1533,6 +1533,8 @@ body:not(.kb-owner-on) #kBento .kb-sec.kb-owner{display:none}
     rupee:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 6h10M7 10h10M9 6c4 0 5 2 5 4s-2 4-5 4h-1l6 6"/></svg>',
     info:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>'
   };
+  /* v1.6.27: calculators can ask the app (same site only) whether the Owner is signed in */
+  window.kinsureGetRole=function(){return (typeof kinsureRole!=='undefined'&&kinsureRole==='owner')?'owner':'user';};
   var mobile=!!document.getElementById('mWelcome');
   function navBtn(p){return document.querySelector('.nav button[data-page="'+p+'"]');}
   function hasRem(){return typeof window.kinsureIncentives==='function'&&!!navBtn('Incentives');}

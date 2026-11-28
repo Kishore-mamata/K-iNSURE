@@ -1310,8 +1310,14 @@ $("p-conditions").addEventListener("click",e=>{ if(e.target===$("p-conditions"))
 document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&!$("p-conditions").hidden) closePermPopup(); });
 
 // Intercept any attempt to modify a rate when Owner is not logged in -> show ONLY Conditions tab
+function kPullMainRole(){
+  /* v1.6.27: ask the K-iNSURE app directly (works only inside the app on the same site) */
+  try{if(window.parent!==window&&typeof window.parent.kinsureGetRole==='function'){KINSURE_MAIN_ROLE=window.parent.kinsureGetRole()==='owner'?'owner':'user';}}catch(e){}
+  return KINSURE_MAIN_ROLE;
+}
 function guardRateAttempt(e){
   if(OWNER_UNLOCKED) return;
+  if(kPullMainRole()==='owner'){OWNER_UNLOCKED=true;try{syncLockUI();}catch(_){}return;}
   e.preventDefault();
   e.stopPropagation();
   if(e.target&&typeof e.target.blur==="function") e.target.blur();
@@ -1329,6 +1335,7 @@ $("trchips").addEventListener("click",guardRateAttempt,true);
 let KINSURE_MAIN_ROLE="user";
 function openOwnerLogin(fromWhere){
   // v1.6.16: no separate Fire login. Unlocks only when the main app is signed in as Owner.
+  kPullMainRole();
   if(KINSURE_MAIN_ROLE==="owner"){OWNER_UNLOCKED=true;syncLockUI();closePermPopup();say("Rates unlocked.");return;}
   showConditionsTab();return;
   LOGIN_RETURN=fromWhere||"main";
