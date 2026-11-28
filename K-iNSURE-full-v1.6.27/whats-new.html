@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f2747">
+<link rel="icon" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<title>What's new · K-iNSURE</title>
+<style>
+  :root{--navy:#0f2747;--teal:#0e7c7b;--ink:#1c2533;--muted:#5d6b7e;--line:#dbe3ee;--bg:#f4f7fb;--ok:#1d7a3e;--okbg:#e9f6ee}
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font:15px/1.55 "Segoe UI",Roboto,Arial,sans-serif;padding-bottom:env(safe-area-inset-bottom)}
+  .bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;padding:10px 14px;padding-top:max(10px,env(safe-area-inset-top));background:var(--navy);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+  .bar img{width:30px;height:30px;border-radius:8px}
+  .bar strong{font-size:16px;flex:1}
+  .bar a{color:#fff;text-decoration:none;border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:600}
+  .hero{background:linear-gradient(120deg,var(--navy),#16407f);color:#fff;padding:18px 16px 22px}
+  .hero h1{margin:0 0 4px;font-size:22px}
+  .hero p{margin:0;opacity:.85;font-size:14px}
+  .ver{display:inline-block;margin-top:10px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:3px 10px;font-size:12px}
+  main{max-width:760px;margin:0 auto;padding:14px}
+  details{background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
+  summary{list-style:none;cursor:pointer;display:flex;gap:12px;align-items:center;padding:14px 16px;font-weight:650;color:var(--navy)}
+  summary::-webkit-details-marker{display:none}
+  summary .ic{flex:none;width:36px;height:36px;border-radius:10px;background:#e6f3f3;display:flex;align-items:center;justify-content:center;font-size:18px}
+  summary .t{flex:1}
+  summary .t small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+  summary::after{content:"›";font-size:22px;color:var(--muted);transition:transform .2s}
+  details[open] summary::after{transform:rotate(90deg)}
+  .body{padding:0 16px 16px;border-top:1px solid var(--line)}
+  .body p{margin:12px 0 8px}
+  .tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:8px 0}
+  th,td{border:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+  th{background:#eef3fa;color:var(--navy)}
+  td.n{text-align:right;white-space:nowrap}
+  .ok{background:var(--okbg);color:var(--ok);font-weight:650}
+  .old{color:#a3262a;text-decoration:line-through}
+  .note{background:var(--okbg);color:var(--ok);border-radius:10px;padding:9px 12px;font-size:13.5px;margin-top:8px}
+  ul{padding-left:20px;margin:8px 0}
+  li{margin:4px 0}
+  footer{text-align:center;color:var(--muted);font-size:13px;padding:6px 16px 28px}
+  footer a{color:var(--navy)}
+  .home{display:block;text-align:center;margin:16px auto 8px;max-width:320px;background:var(--teal);color:#fff;text-decoration:none;font-weight:700;padding:12px;border-radius:999px}
+</style>
+</head>
+<body>
+<div class="bar">
+  <img src="icons/icon-192.png" alt="">
+  <strong>What's new</strong>
+  <a href="#" id="back">← Back</a>
+</div>
+<div class="hero">
+  <h1>K-iNSURE update</h1>
+  <p>Motor &amp; Fire Premium Calculators: corrections and new features</p>
+  <span class="ver">Version 1.6.27 · 28 November 2026</span>
+</div>
+
+<main>
+  <details open>
+    <summary><span class="ic">🎨</span><span class="t">New look: Bento design in navy and blue<small>New in 1.6.20 – 1.6.27</small></span></summary>
+    <div class="body">
+      <p>A fresh home screen with tiles for Motor, Fire and Health, plus Remuneration for agents and Owner tiles for quotations, tariffs and settings. The dashboard information cards and panels are kept below the tiles, and Common Workspace now lists Motor, Fire and Health Insurance.</p>
+      <p>The whole app now uses navy and electric blue, with sunflower yellow for small highlights, to match the K-CUBE logo.</p>
+      <p>Premium results in Motor, Fire and Health are shown as easy-to-read tiles.</p>
+      <p>Fixed: the old light-green welcome card no longer flashes before the new one when a calculator opens.</p>
+      <p>Larger, easier-to-read text in the Motor, Fire and Health calculators on phones, laptops and large screens. Printed quotations are unchanged.</p>
+      <p>Fixed (1.6.27): in the Fire calculator, a signed-in Owner no longer sees "Permission Denied" when changing the terrorism rate or colour theme.</p>
+      <p>No tariffs, rates, discounts or calculations were changed. Quotation PDFs and WhatsApp messages are the same as before.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">📤</span><span class="t">Owner rate changes reach every app<small>New in 1.6.18 · 1.6.19</small></span></summary>
+    <div class="body">
+      <p>Motor and Fire rate changes made on the Owner Desktop can now be published to every Public, Agents and Owner app with one click. The <b>Publish rates to all apps</b> panel is at the top of <b>Rates, stamp and saved quotations</b> in the Motor calculator, the rates section of the Fire calculator, and the Tariff &amp; Rates page.</p>
+      <p>Apps pick up published rates within about 10 minutes, the next time they are opened online. <b>Publish built-in rates</b> undoes all published changes.</p>
+      <p>Public and Agents apps always use the published rates. Owner edits stay on the Owner's device until they are published.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">⚡</span><span class="t">E-PCV (Taxi): Own Damage rates<small>New in 1.6.17</small></span></summary>
+    <div class="body">
+      <p>The Electric E-PCV (Taxi) category now uses its own Own Damage tariff in place of the temporary Taxi rates.</p>
+      <p>Zone A / Zone B: up to 5 years 3.284% / 3.191%; 5 to 7 years 3.366% / 3.271%; above 7 years 3.448% / 3.351%. The rate is the same for all motor power bands.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🛡️</span><span class="t">Security tightening<small>New in 1.6.17</small></span></summary>
+    <div class="body">
+      <p>The Motor and Fire calculators now accept Owner unlock only from the K-iNSURE app itself. Other websites can no longer send them an unlock signal.</p>
+      <p>No tariffs, rates, discounts or calculations were changed.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🧭</span><span class="t">Three editions: Public, Agents and Owner desktop<small>New in 1.6.16</small></span></summary>
+    <div class="body">
+      <p><b>K-iNSURE-P</b> (public): Motor, Fire and Health calculators only. Works on phone and computer.</p>
+      <p><b>K-iNSURE-BAGS</b> (agents): the calculators plus <b>Remuneration</b>, which opens with the Agent access code.</p>
+      <p><b>K-iNSURE</b> (owner desktop): everything, with an Owner sign-in button for tariffs, quotations and settings.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🔒</span><span class="t">Ready for public use<small>New in 1.6.16</small></span></summary>
+    <div class="body">
+      <p>The User / Owner selector has been removed. Everyone now uses the calculators, and rate editing, saved quotations and settings are reserved for the app owner.</p>
+      <p>The Fire calculator no longer has a built-in login.</p>
+      <p><b>Remuneration</b> is for agents only: it opens with the Agent access code (asked once on each device). The rates are stored in coded form, so they cannot be read from the app's files without the code.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🚚</span><span class="t">Goods Lorry weight loading shown in OD<small>New in 1.6.16</small></span></summary>
+    <div class="body">
+      <p>The ₹27 per 100 kg loading for gross vehicle weight above 12,000 kg is now included in the Own damage line, so Net OD Premium (A) and Net Premium (A+B) add up correctly. The total payable was already correct.</p>
+      <p>The ₹27 per 100 kg is charged proportionately, as in the insurer quotation: GVW 12,150 kg → own damage ₹1,792, total payable ₹39,636.</p>
+      <p>Example: Goods Lorry, IDV ₹1,00,000, OD rate 1.751% — Own damage ₹1,778, Net Premium ₹37,466, total payable ₹39,620 (matches insurer).</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">⛽</span><span class="t">Built-in CNG/LPG for Private Car and long-term TP<small>New in 1.6.13</small></span></summary>
+    <div class="body">
+      <p>Private Car and Two-Wheeler built-in CNG/LPG own damage is now 5% of OD after discount (previously 2% of Basic OD), as in the insurer quotation.</p>
+      <p>The ₹60 CNG/LPG third-party liability is now charged for each year of TP cover: ₹180 for a 3-year TP policy, ₹300 for 5 years.</p>
+      <p>Example: new Private Car, Bundled 1 Yr OD + 3 Yrs TP, IDV ₹7,27,750, 80% discount, Nil Dep 10%, built-in CNG — CNG OD ₹228, CNG TP ₹180, total payable ₹16,410 (matches insurer).</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">⛽</span><span class="t">NCB on built-in CNG/LPG, and Taxi GST<small>New in 1.6.12</small></span></summary>
+    <div class="body">
+      <p>For commercial vehicles with built-in CNG/LPG, the No Claim Bonus now also applies to the CNG/LPG own damage loading (5% of OD after discount), as in the insurer quotation.</p>
+      <p>Taxi and Electric Taxi GST is now shown as CGST 9% + SGST 9%, each rounded separately, the same as Private Car.</p>
+      <p>Example: Taxi, IDV ₹7,77,000, 60% discount, 25% NCB, built-in CNG — NCB ₹2,813, Net premium ₹22,682, total payable ₹26,764 (matches insurer).</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">⚡</span><span class="t">Electric Private Car own damage rates<small>New in 1.6.7</small></span></summary>
+    <div class="body">
+      <p>Electric Private Cars now use their own own-damage rates (% of IDV) by motor power and vehicle age, instead of the petrol/diesel Private Car rates.</p>
+      <p><b>Zone A</b> (Ahmedabad, Bengaluru, Chennai, Hyderabad, Kolkata, Mumbai, New Delhi, Pune) and <b>Zone B</b> (rest of India, including Andhra Pradesh) are picked automatically from the vehicle number.</p>
+      <table style="border-collapse:collapse;font-size:.9em;margin-top:6px">
+        <tr><th style="text-align:left;padding:3px 8px">Motor power</th><th style="padding:3px 8px">Up to 5 yrs<br>A / B</th><th style="padding:3px 8px">5 to 10 yrs<br>A / B</th><th style="padding:3px 8px">Above 10 yrs<br>A / B</th></tr>
+        <tr><td style="padding:3px 8px">Up to 30 kW</td><td style="padding:3px 8px">3.127% / 3.039%</td><td style="padding:3px 8px">3.283% / 3.191%</td><td style="padding:3px 8px">3.362% / 3.267%</td></tr>
+        <tr><td style="padding:3px 8px">30 to 65 kW</td><td style="padding:3px 8px">3.283% / 3.191%</td><td style="padding:3px 8px">3.447% / 3.351%</td><td style="padding:3px 8px">3.529% / 3.430%</td></tr>
+        <tr><td style="padding:3px 8px">Above 65 kW</td><td style="padding:3px 8px">3.440% / 3.343%</td><td style="padding:3px 8px">3.612% / 3.510%</td><td style="padding:3px 8px">3.698% / 3.594%</td></tr>
+      </table>
+      <p>Owners can view and edit these rates under Tariff &amp; Rates → E-Private Car.</p>
+      <p>Quotations is Owner-only.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🔠</span><span class="t">Larger text on computer;<small>New in 1.6.6</small></span></summary>
+    <div class="body">
+      <p>On wide computer screens, the menu, dashboard and all calculators now use larger text. Phones and small laptops are unchanged.</p>
+      <p></p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🖥️</span><span class="t">Full-width calculators on computer<small>New in 1.6.5</small></span></summary>
+    <div class="body">
+      <p>On computer screens, the Motor and Fire calculators now use the full width of the window instead of a narrow centre column. Phone layout is unchanged.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🔒</span><span class="t">Owner-only menu items<small>New in 1.6.4</small></span></summary>
+    <div class="body">
+      <p>In the <b>User</b> role, Tariff &amp; Rates, Settings and What's new are hidden from the menu, the dashboard and the phone home screen. Switch to <b>Owner</b> to see them.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🩺</span><span class="t">Health: simpler first section and full date picker<small>New in 1.6.3</small></span></summary>
+    <div class="body">
+      <p><b>IHP</b>: Location and Family Members are now one section. <b>FMP</b>: Policy Setup and Insured Members are now one section.</p>
+      <p>The Date of Birth calendar now shows every year up to today. Age limits are still checked when you tap Calculate.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">✨</span><span class="t">Matching welcome screens<small>New in 1.6.2</small></span></summary>
+    <div class="body">
+      <p>Motor, Fire and Health now open with the same clean welcome card: K-CUBE logo, "Welcome to K-iNSURE", a yellow <b>GET STARTED</b> button, and "All rights reserved - Kota Kishore Kumar (Kota112457.uii.ms)".</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🔧</span><span class="t">Commercial vehicles: electrical accessories corrected<small>Fixed in 1.6.1</small></span></summary>
+    <div class="body">
+      <p>For commercial vehicles (Taxi, Auto, Goods, Bus and others), the electrical accessories premium (4% of value) is now part of <b>Own Damage</b>, so the tariff discount and NCB apply to it, as in the insurer worksheet.</p>
+      <p>Example: Taxi, IDV ₹2,50,000, accessories ₹1,13,000, discount 70% — total now ₹19,232 (was ₹22,965). Private cars and two-wheelers are unchanged.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🩺</span><span class="t">Health Calculator is here<small>New in 1.6.0</small></span></summary>
+    <div class="body">
+      <p>The <b>Health Calculator</b> now works, with four products: <b>IHP</b> (Individual Health), <b>FMP</b> (Family Medicare, floater or individual), <b>STUMP</b> (Super Top-Up) and <b>Yuvaan</b>.</p>
+      <p>Enter the PIN code (zone is found automatically), add family members with date of birth and sum insured, and tap Calculate. Share the summary on WhatsApp or as a PDF. Open it from the menu, the Dashboard card, or the phone home screen.</p>
+      <p>Health rates &amp; logic: Health Dept. Team, Nagpur.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🩺</span><span class="t">Health Calculator tab<small>New in 1.4.9</small></span></summary>
+    <div class="body">
+      <p>The Dashboard's left menu now has <b>Health Calculator</b> (below Fire Calculator). It was marked <b>Coming soon</b> while it was being built.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🎨</span><span class="t">New look: Midnight, grey and sunflower yellow<small>New in 1.4.8</small></span></summary>
+    <div class="body">
+      <p>The home screen, Motor and Fire calculators now use a midnight-navy and sunflower-yellow design on a grey background, with matching text colours.</p>
+      <p>Only the colours changed: your K-CUBE logo, the layout, every calculation and the printed or shared quotation stay exactly the same.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🔌</span><span class="t">No Engine Protection for electric vehicles<small>New in 1.4.7</small></span></summary>
+    <div class="body">
+      <p>Electric vehicles have no engine, so <b>Engine Protection (Platinum)</b>, <b>Engine Protection — Manual</b> and <b>Engine &amp; Gearbox</b> are no longer shown or charged for E-Private Car, E-Two Wheeler, EV-2W Passenger and E-PCV (Taxi).</p>
+      <p>This applies to every policy type: Comprehensive, Standalone OD and Bundled. Petrol, diesel and CNG vehicles are unchanged.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">⚡</span><span class="t">Bundled policy for electric vehicles<small>New in 1.4.6</small></span></summary>
+    <div class="body">
+      <p>New <b>E-Private Cars</b> and <b>E-Two Wheelers</b> now have the <b>Bundled policy</b> option, the same as Private Cars and Two Wheelers:</p>
+      <p>E-Private Car: BDL-1Yr OD + 3Yr TP, or BDL-3Yr OD + 3Yr TP.<br>E-Two Wheeler: BDL-1Yr OD + 5Yr TP, or BDL-5Yr OD + 5Yr TP.</p>
+      <p>Long-term Third Party for E-Two Wheelers is now 5 years (it was 3 years).</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🔒</span><span class="t">Fire: "Permission Denied" pop-up<small>New in 1.4.5</small></span></summary>
+    <div class="body">
+      <p>In the Fire calculator, when someone who is not the Owner tries to change a rate or setting, a <b>Permission Denied</b> pop-up now appears over the calculator instead of a separate Conditions screen.</p>
+      <p>Tap <b>OK</b> to go back to the calculator (nothing entered is lost).</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">⛽</span><span class="t">Built-in CNG/LPG: commercial vehicles corrected<small>Matches the insurer worksheet</small></span></summary>
+    <div class="body">
+      <p>For commercial vehicles (lorry, goods auto, taxi, bus and others), the built-in CNG/LPG Own Damage loading is now <b>5% of Own Damage after the tariff discount</b>. Private cars and two-wheelers stay at 2% of Basic Own Damage.</p>
+      <p>For Goods Auto and Goods Lorry, the ₹60 CNG/LPG liability is now taxed at <b>5% GST together with Basic TP</b>, not at 18%.</p>
+      <p>Example: Goods Lorry, IDV ₹6,24,150, discount 45.1% — total now ₹27,002, same as the insurer.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🛞</span><span class="t">Tyre &amp; Rim on Standalone OD<small>Private cars</small></span></summary>
+    <div class="body">
+      <p>Private-car Tyre and Rim Protector can now be added to <b>Standalone OD</b> policies as well as one-year package policies (e.g. ₹2,000 for ₹50,000 cover).</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">₹</span><span class="t">Whole rupees everywhere<small>Motor and Fire calculators</small></span></summary>
+    <div class="body">
+      <p>All amounts in the Motor and Fire calculators, quotations and WhatsApp messages are now shown in whole rupees, with paise rounded off. The amount in words no longer shows paise.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🏷️</span><span class="t">No Claim Bonus now includes Return to Invoice<small>Matches the insurer's quotation</small></span></summary>
+    <div class="body">
+      <p>NCB is now applied to Own Damage after discount, Nil Depreciation <b>and Return to Invoice</b> premium.</p>
+      <p>Example: Private car, IDV ₹21,68,451, discount 80%, NCB 20% — NCB now ₹6,618.11, same as the insurer.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">🛡️</span><span class="t">CNG/LPG on Third Party Only<small>₹60 CNG/LPG liability can now be added</small></span></summary>
+    <div class="body">
+      <p>With <b>Third Party Only</b>, the Coverages column now shows the <b>CNG/LPG Kit</b> and <b>Built in CNG/LPG</b> options, so the fixed ₹60 CNG/LPG TP liability is charged. Other add-ons stay hidden, because they need Own Damage cover.</p>
+      <p>Example: Taxi, Zone B, 1197 cc, 4 passengers — TP ₹12,287 + GST ₹2,211.66, same as the insurer.</p>
+    </div>
+  </details>
+  <details>
+    <summary><span class="ic">✅</span><span class="t">Nil Depreciation: NCB now correct<small>Matches the insurer's quotation</small></span></summary>
+    <div class="body">
+      <p>No Claim Bonus is now worked out on the OD premium <strong>including</strong> the Nil Depreciation premium, the same way the insurer calculates it.</p>
+      <p>Example: Goods Lorry, IDV ₹8,80,000, discount 80%, NCB 20%, IMT-23 and Nil Dep</p>
+      <div class="tw"><table>
+        <tr><th>Line</th><th class="n">Before</th><th class="n">Now</th></tr>
+        <tr><td>No Claim Bonus @ 20%</td><td class="n old">− ₹708.80</td><td class="n ok">− ₹1,325.16</td></tr>
+        <tr><td>Net OD Premium</td><td class="n old">₹5,917</td><td class="n ok">₹5,301</td></tr>
+      </table></div>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="ic">📅</span><span class="t">Nil Depreciation: age limits<small>Up to 7 years or 5 years, by vehicle</small></span></summary>
+    <div class="body">
+      <div class="tw"><table>
+        <tr><th>Vehicle</th><th>Up to 1 yr</th><th>1–2 yrs</th><th>Next</th><th>Extended</th><th>Limit</th></tr>
+        <tr><td>Private car, Two-wheeler</td><td>10%</td><td>20%</td><td>30% (2–5 yrs)</td><td>40% (5–7 yrs)</td><td>7 years</td></tr>
+        <tr><td>Commercial, Taxi, 3-wheeler</td><td>10%</td><td>20%</td><td>30% (2–3 yrs)</td><td>40% (3–5 yrs)</td><td>5 years</td></tr>
+      </table></div>
+      <p>Past the limit, the Nil Depreciation option can't be selected.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="ic">⚡</span><span class="t">E-PCV (Taxi): all add-on covers<small>Every Taxi add-on now available</small></span></summary>
+    <div class="body">
+      <p>E-PCV (Taxi) now offers Nil Depreciation, Return to Invoice, Consumables, NCB Protect, EV Protect, EMI Protect, Loss of Key, Personal Belongings, Platinum PA, Engine Protection, Roadside Assistance, Towing, Medical Expenses, Personal Effects, Road Tax Cover and Electrical Fittings.</p>
+      <p>CNG/LPG is not offered for electric vehicles (E-PCV, E-Private Car, E-Two Wheeler, EV-2W Passenger), because they run only on battery power.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="ic">🛠️</span><span class="t">Engine Protection (Platinum): premium corrected<small>Now charged as % of IDV</small></span></summary>
+    <div class="body">
+      <p>The premium was 100 times too low before. Example for IDV ₹5,00,000:</p>
+      <div class="tw"><table>
+        <tr><th>Age</th><th>Two Wheeler</th><th>Private Car</th><th>Passenger Commercial</th></tr>
+        <tr><td>Up to 1 yr</td><td>0.07% = ₹350</td><td>0.13% = ₹650</td><td>0.15% = ₹750</td></tr>
+        <tr><td>1–2 yrs</td><td>0.09% = ₹450</td><td>0.16% = ₹800</td><td>0.20% = ₹1,000</td></tr>
+        <tr><td>2–3 yrs</td><td>0.12% = ₹600</td><td>0.21% = ₹1,050</td><td>0.26% = ₹1,300</td></tr>
+        <tr><td>3–4 yrs</td><td>0.17% = ₹850</td><td>0.27% = ₹1,350</td><td>Not applicable</td></tr>
+        <tr><td>4–5 yrs</td><td>0.22% = ₹1,100</td><td>0.32% = ₹1,600</td><td>Not applicable</td></tr>
+      </table></div>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="ic">🔒</span><span class="t">Rates &amp; saved quotations by vehicle<small>Owner only</small></span></summary>
+    <div class="body">
+      <ul>
+        <li>Rates, stamp and saved quotations can be opened only in <strong>Owner</strong> mode.</li>
+        <li>They show only the tariffs, add-on ratings and saved quotations for the vehicle you have selected.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="ic">📲</span><span class="t">Easy app install<small>One tap: no menus needed</small></span></summary>
+    <div class="body">
+      <p>Tap <strong>Install</strong> on the bar at the bottom of the home screen, or <strong>📲 Install app</strong> on the phone welcome screen.</p>
+      <ul>
+        <li><strong>Android (Chrome):</strong> the app installs straight away.</li>
+        <li><strong>iPhone:</strong> step-by-step help for Safari's <em>Add to Home Screen</em>.</li>
+        <li><strong>Opened from WhatsApp:</strong> shows how to open the link in Chrome first, with a <em>Copy app link</em> button.</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary><span class="ic">🌐</span><span class="t">Our website<small>Kota112457.uii.ms</small></span></summary>
+    <div class="body">
+      <p>Visit <a href="https://kota112457.uii.ms" target="_blank" rel="noopener"><strong>Kota112457.uii.ms</strong></a>. The link now appears in the app menu, on quotations and in WhatsApp quotation messages.</p>
+    </div>
+  </details>
+
+  <div class="note">To get this update: open K-iNSURE with internet on, close it fully, and open it again.</div>
+  <a class="home" href="#" id="home">Open K-iNSURE</a>
+</main>
+
+<footer>
+  K-iNSURE Premium Calculator · © Kota Kishore Kumar<br>
+  <a href="https://kota112457.uii.ms" target="_blank" rel="noopener">Kota112457.uii.ms</a>
+</footer>
+
+<script>
+(function(){
+  var phone = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.matchMedia('(max-width: 820px)').matches;
+  var appHome = phone ? 'mobile.html' : 'index.html';
+  document.getElementById('home').href = appHome;
+  document.getElementById('back').addEventListener('click', function(e){
+    e.preventDefault();
+    var fromApp = document.referrer && document.referrer.indexOf(location.host) !== -1;
+    if (fromApp && history.length > 1) history.back(); else location.href = appHome;
+  });
+})();
+</script>
+</body>
+</html>
