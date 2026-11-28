@@ -4175,9 +4175,29 @@ const ADDON_DEFAULTS={
   cngBuiltInOD:5,cngBuiltInODCommercial:5,cngKitOD:4,cngTP:60,electricalFittings:4,roadTax:1.67,imt23Loading:15,
   cpaOwnerDriver:{1:325,3:839,5:1316},legalLiabilityDriver:50,ltpa:1300,employeeLiabilityPerPerson:50,nfppPerPerson:75
 };
-const ADDON_RATES=(()=>{let v=JSON.parse(lsGet("mc_addon_rates")||"null");return v&&typeof v==="object"?mergeAddon(ADDON_DEFAULTS,v):JSON.parse(JSON.stringify(ADDON_DEFAULTS));})();
+/* v1.6.18: Owner rate edits are stored as "changed values only" (path -> number), so
+   built-in tariff updates still reach every user and a published file stays small. */
+function kFlatDiff(base,cur,pre,out){
+  out=out||{};
+  if(typeof base==="number"){if(typeof cur==="number"&&Number.isFinite(cur)&&cur!==base)out[pre]=cur;return out;}
+  if(base&&typeof base==="object"&&cur&&typeof cur==="object"){for(const k of Object.keys(base))if(Object.prototype.hasOwnProperty.call(cur,k))kFlatDiff(base[k],cur[k],pre?pre+"."+k:k,out);}
+  return out;
+}
+function kApplyFlat(target,map){
+  let n=0;
+  for(const p of Object.keys(map||{})){
+    const v=Number(map[p]);if(!Number.isFinite(v))continue;
+    const parts=p.split(".");let o=target;
+    for(let i=0;i<parts.length-1&&o!=null;i++)o=o[parts[i]];
+    const last=parts[parts.length-1];
+    if(o&&typeof o==="object"&&typeof o[last]==="number"&&o[last]!==v){o[last]=v;n++;}
+  }
+  return n;
+}
+const ADDON_RATES=(()=>{let v=null;try{v=JSON.parse(lsGet("mc_addon_rates")||"null");}catch(e){v=null;}const base=JSON.parse(JSON.stringify(ADDON_DEFAULTS));if(v&&v.v===2){kApplyFlat(base,v.diff);return base;}return v&&typeof v==="object"?mergeAddon(ADDON_DEFAULTS,v):base;})();
 function mergeAddon(base,saved){if(Array.isArray(base)&&Array.isArray(saved)){return base.map((v,i)=>saved[i]===undefined?v:(typeof v==="number"&&Number.isFinite(Number(saved[i]))?Number(saved[i]):mergeAddon(v,saved[i])));}if(base&&saved&&typeof base==="object"&&typeof saved==="object"&&!Array.isArray(base)&&!Array.isArray(saved)){const o={...base};for(const k of Object.keys(base))if(saved[k]!==undefined)o[k]=mergeAddon(base[k],saved[k]);return o;}return typeof base==="number"&&Number.isFinite(Number(saved))?Number(saved):base;}
-function saveAddonRates(){lsSet("mc_addon_rates",JSON.stringify(ADDON_RATES));}
+function saveAddonRates(){const d=kFlatDiff(ADDON_DEFAULTS,ADDON_RATES,"",{});lsSet("mc_addon_rates",Object.keys(d).length?JSON.stringify({v:2,diff:d}):"");}
+try{const _o=JSON.parse(lsGet("mc_addon_rates")||"null");if(_o&&typeof _o==="object"&&_o.v!==2)saveAddonRates();}catch(e){}
 function setAddonRate(path,value){const parts=path.split(".");let o=ADDON_RATES;for(let i=0;i<parts.length-1;i++)o=o[parts[i]];const last=parts[parts.length-1];if(Number.isFinite(Number(value)))o[last]=Number(value);saveAddonRates();}
 /* ---- rates (editable, kept in this browser) ---- */
 const clone=o=>JSON.parse(JSON.stringify(o));
@@ -4207,17 +4227,23 @@ function loadRates(){
   try{
     const saved=JSON.parse(lsGet("mc_rates")||"null");
     if(!saved||typeof saved!=="object")return false;
+    if(saved.v===2)return kApplyFlat(R,saved.diff)>0;
+    /* Older full-copy format: keep only real edits. E-PCV (Taxi) OD rates were replaced in v1.6.17,
+       so the old provisional copy is not carried forward. */
+    if(saved.etaxi){delete saved.etaxi.rates;delete saved.etaxi.ratesB;}
     let used=false;
     for(const id of Object.keys(saved)){
       if(R[id])used=restoreRateValues(R[id],saved[id])||used;
     }
+    const d=kFlatDiff(MOTOR,R,"",{});
+    lsSet("mc_rates",Object.keys(d).length?JSON.stringify({v:2,diff:d}):"");
     return used;
   }catch(e){return false;}
 }
 let RSRC=lsGet("mc_src");
 function setSrc(){$("ratesrc").textContent="Rates: "+(RSRC||"built-in tariff");}
 function saveRates(manual){
-  lsSet("mc_rates",EDITEDANY()?JSON.stringify(R):"");
+  {const d=kFlatDiff(MOTOR,R,"",{});lsSet("mc_rates",Object.keys(d).length?JSON.stringify({v:2,diff:d}):"");}
   if(manual)RSRC=(RSRC&&RSRC!=="edited in this browser")?RSRC.replace(/ \(edited\)$/,"")+" (edited)":"edited in this browser";
   lsSet("mc_src",RSRC);setSrc();
 }

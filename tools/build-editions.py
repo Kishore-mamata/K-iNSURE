@@ -40,6 +40,9 @@ for k,e in ED.items():
         # no owner access at all
         s=rep(s,'<script src="owner-key.js"></script>\n','')
         s=cut(s,'<script id="kinsure-owner-entry">','</script>')
+        # v1.6.18: Public/Agents always mirror the published rates and have no Publish panel
+        s=rep(s,'var OWNER_ED=true; /*K-EDITION*/','var OWNER_ED=false; /*K-EDITION*/')
+        s=cut(s,'<script id="kinsure-publish">','</script>')
         # public-friendly dashboard
         s=rep(s,'''<div class="metric"><small>SHARED WORKSPACE</small><strong>Quotations &amp; Settings</strong></div>''',
                '<div class="metric"><small>SHARE</small><strong>WhatsApp &amp; print</strong></div>' if k=='P' else
