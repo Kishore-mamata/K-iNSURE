@@ -209,8 +209,9 @@ h1,.panel h3{color:#17345d!important}
     </section>
     <section class="lower">
       <div class="panel"><h3>Common Workspace</h3>
-        <div class="workrow"><span>Motor Calculator</span><span>Separate tariff &amp; rules →</span></div>
-        <div class="workrow"><span>Fire Calculator</span><span>Separate tariff &amp; rules →</span></div>
+        <div class="workrow"><span>Motor Insurance</span><span>Separate tariff &amp; rules →</span></div>
+        <div class="workrow"><span>Fire Insurance</span><span>Separate tariff &amp; rules →</span></div>
+        <div class="workrow"><span>Health Insurance</span><span>Separate tariff &amp; rules →</span></div>
         <div class="workrow"><span>Quotations</span><span>Shared module planned →</span></div>
         <div class="workrow"><span>Tariff &amp; Rates</span><span>Owner-managed modules →</span></div>
       </div>
@@ -728,8 +729,8 @@ initializeRole();
   };
   updateRoleUI();
   /* dashboard shortcut rows */
-  var rows=document.querySelectorAll('.lower .workrow'),go=[function(){openModule('motor.html');},function(){openModule('fire.html');},function(){kinsureShowQuotations(document.querySelector('[data-page="Quotations"]'));},function(){kinsureShowTariff(document.querySelector('[data-page="Tariff & Rates"]'));}];
-  var lab=['Open calculator →','Open calculator →','View saved quotations →','View rates →'];
+  var rows=document.querySelectorAll('.lower .workrow'),go=[function(){openModule('motor.html');},function(){openModule('fire.html');},function(){openModule('health.html');},function(){kinsureShowQuotations(document.querySelector('[data-page="Quotations"]'));},function(){kinsureShowTariff(document.querySelector('[data-page="Tariff & Rates"]'));}];
+  var lab=['Open calculator →','Open calculator →','Open calculator →','View saved quotations →','View rates →'];
   rows.forEach(function(r,i){if(!go[i])return;r.setAttribute('role','button');r.tabIndex=0;r.addEventListener('click',go[i]);r.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();go[i]();}});var s=r.querySelector('span:last-child');if(s)s.textContent=lab[i];});
 })();
 </script>
@@ -1439,18 +1440,166 @@ html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6) body.k-user-role .k-o
   });
 })();
 </script>
+<!-- ===== K-iNSURE Bento home + navy/electric-blue theme (v1.6.20) ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style id="kinsure-theme-navy">
+/* v1.6.20: navy #0A1F44, electric blue #1A5FE0, light #F5F7FA, sunflower #FFC21A for small touches only. Logo images untouched. */
+:root{--kb-bg:#F5F7FA;--kb-ink:#0A1F44;--kb-muted:#4A5A78;--kb-line:#DCE3EE;--kb-blue:#1A5FE0;--kb-blue-d:#144CB8;--kb-tint:#E8F0FE;--kb-tint2:#DCE8FC;--kb-sun:#FFC21A;--kb-display:'Space Grotesk','Segoe UI',system-ui,sans-serif;--kb-body:Inter,'Segoe UI',system-ui,-apple-system,sans-serif}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body .app,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body main{background:var(--kb-bg)!important;color:var(--kb-ink)!important;font-family:var(--kb-body)!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body aside.sidebar{background:var(--kb-ink)!important;border-right:0!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body aside.sidebar button .ico{background:rgba(255,255,255,.08)!important;color:#B5C7E8!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body aside.sidebar button.active,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body aside.sidebar button:hover{background:var(--kb-blue)!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body aside.sidebar button.active .txt,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body aside.sidebar button:hover .txt{color:#FFFFFF!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body aside.sidebar button.active .ico,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body aside.sidebar button:hover .ico{background:#FFFFFF!important;color:var(--kb-blue)!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body .topline,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body .topline *{color:var(--kb-ink)!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #moduleToolbar{background:#FFFFFF!important;border-color:var(--kb-line)!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #moduleToolbar button{background:var(--kb-blue)!important;color:#FFFFFF!important;box-shadow:none!important;border-radius:12px!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #kNotice .box{border-top-color:var(--kb-blue)!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #kNoticeOk{background:var(--kb-blue)!important;color:#FFFFFF!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #kInstallBar{background:var(--kb-ink)!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body .m-foot,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body .m-foot *{color:var(--kb-muted)!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #mBar{background:var(--kb-ink)!important;border-bottom:0!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #mBar button{background:var(--kb-blue)!important;color:#FFFFFF!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #mWelcome{background:var(--kb-bg)!important;border-bottom:0!important;color:var(--kb-ink)!important}
+/* Old dashboard content is kept (hidden) for the edition builder; Bento replaces it on screen */
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body.kb-on #dashboardView>:not(#kBento):not(.metrics):not(.lower):not(.kb-foot),html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body.kb-on .k-beta,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body.kb-on #mWelcome>:not(#kBento):not(#mRoleSlot){display:none!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView{padding-top:8px!important}
+/* Dashboard info cards and panels kept under the tiles (v1.6.20b) */
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .metrics{max-width:1180px;margin:22px auto 0!important;gap:14px!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .lower{max-width:1180px;margin:14px auto 0!important;gap:14px!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .metric,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .panel{background:#FFFFFF!important;border:1px solid #DCE3EE!important;border-radius:20px!important;box-shadow:none!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .metric small{color:#4A5A78!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .metric strong,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .panel h3,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .workrow span:first-child,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .principle strong{color:#0A1F44!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .workrow,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .principle{background:#F5F7FA!important;box-shadow:none!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .workrow span:last-child,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .workrow a{color:#1A5FE0!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .principle{border-left-color:#0A1F44!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .principle.gold{border-left-color:#FFC21A!important}
+html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .principle small,html:not(#n1):not(#n2):not(#n3):not(#n4):not(#n5):not(#n6):not(#n7) body #dashboardView .principle p{color:#4A5A78!important}
+/* Bento */
+#kBento{max-width:1180px;margin:0 auto;padding:6px 0 24px;font-family:var(--kb-body);color:var(--kb-ink);text-align:left}
+#kBento *{box-sizing:border-box}
+#kBento .kb-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:6px 4px 18px}
+#kBento .kb-top{display:none;align-items:center;justify-content:space-between;margin-bottom:14px}
+#kBento .kb-top img{width:44px;height:44px;border-radius:14px;display:block}
+#kBento h1.kb-title{margin:0!important;padding:0!important;background:none!important;border:0!important;font-family:var(--kb-display)!important;font-size:clamp(34px,5vw,48px)!important;line-height:1!important;font-weight:700!important;letter-spacing:-.03em!important;color:var(--kb-ink)!important}
+#kBento .kb-lead{margin:8px 0 0;font-size:15px;color:var(--kb-muted)}
+#kBento .kb-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;background:var(--kb-sun);color:var(--kb-ink);font-size:11.5px;font-weight:700;letter-spacing:.04em;white-space:nowrap}
+#kBento .kb-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+#kBento .kb-ownergrid{grid-column:1/-1;display:none;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+body.kb-owner-on #kBento .kb-ownergrid{display:grid}
+#kBento .kb-tile{position:relative;border:0;border-radius:24px;padding:18px;text-align:left;font:inherit;color:inherit;display:flex;flex-direction:column;justify-content:space-between;gap:12px;min-height:150px;cursor:pointer;transition:transform .15s ease,box-shadow .15s ease;text-decoration:none}
+#kBento button.kb-tile:hover,#kBento a.kb-tile:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(10,31,68,.10)}
+#kBento .kb-tile:focus-visible{outline:3px solid var(--kb-blue);outline-offset:3px}
+#kBento .kb-t{font-family:var(--kb-display);font-weight:700;font-size:22px;letter-spacing:-.01em;line-height:1.1}
+#kBento .kb-s{font-size:13px;line-height:1.4;margin-top:4px}
+#kBento .kb-motor{background:var(--kb-ink);color:#FFFFFF}
+#kBento .kb-motor .kb-t{font-size:24px}
+#kBento .kb-motor .kb-s{color:#B5C7E8}
+#kBento .kb-row{display:flex;justify-content:space-between;align-items:flex-start}
+#kBento .kb-go{width:38px;height:38px;border-radius:999px;background:var(--kb-blue);color:#FFFFFF;display:flex;align-items:center;justify-content:center;flex:none}
+#kBento .kb-fire{background:var(--kb-tint2);color:var(--kb-ink)}
+#kBento .kb-health{background:var(--kb-blue);color:#FFFFFF}
+#kBento .kb-health .kb-s{color:#DCE8FC!important}
+#kBento .kb-fire .kb-s{color:var(--kb-muted)}
+#kBento .kb-rem{grid-column:1/-1;min-height:96px;background:var(--kb-tint);border:1px solid #C7D9FA;flex-direction:row;align-items:center;justify-content:flex-start;gap:14px}
+#kBento .kb-rem .kb-ic{width:48px;height:48px;border-radius:14px;background:var(--kb-blue);color:#FFFFFF;display:flex;align-items:center;justify-content:center;flex:none}
+#kBento .kb-rem .kb-t{font-size:19px}
+#kBento .kb-mini{min-height:104px;border-radius:22px;padding:16px}
+#kBento .kb-white{background:#FFFFFF;border:1px solid var(--kb-line)}
+#kBento .kb-dark{background:#06142E;color:#FFFFFF}
+#kBento .kb-lab{font-size:12.5px;font-weight:600;color:var(--kb-muted)}
+#kBento .kb-dark .kb-lab{color:#B5C7E8}
+#kBento .kb-val{font-family:var(--kb-display);font-size:17px;font-weight:700}
+#kBento .kb-info{cursor:default}
+#kBento .kb-foot,#dashboardView>.kb-foot{margin-top:18px;text-align:center;font-size:12px;color:var(--kb-muted);line-height:1.5}
+#kBento .kb-foot a,#dashboardView>.kb-foot a{color:var(--kb-ink);text-decoration:underline}
+#kBento .kb-owner{display:none}
+body.kb-owner-on #kBento .kb-owner{display:flex}
+body:not(.kb-owner-on) #kBento .kb-useronly{display:flex}
+#kBento .kb-sec{grid-column:1/-1;font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--kb-muted);margin:8px 4px -4px}
+body:not(.kb-owner-on) #kBento .kb-sec.kb-owner{display:none}
+@media (max-width:900px){#kBento .kb-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#kBento .kb-ownergrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}#kBento .kb-motor{grid-column:1/-1;min-height:140px}#kBento .kb-tile{min-height:140px}#kBento .kb-mini{min-height:96px}#kBento .kb-rem{min-height:88px}}
+@media (max-width:760px){#kBento{padding:4px 2px 20px}#kBento .kb-top{display:flex}#kBento .kb-head{margin:0 4px 14px}}
+@media (prefers-reduced-motion:reduce){#kBento .kb-tile{transition:none}}
+</style>
+<script id="kinsure-bento">
+(function(){
+  var ICON={
+    car:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 17h14M6 17v2M18 17v2M4 13l2-5a2 2 0 0 1 1.9-1.3h8.2A2 2 0 0 1 18 8l2 5v4H4z"/><circle cx="8" cy="14" r="1"/><circle cx="16" cy="14" r="1"/></svg>',
+    fire:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c1 3 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.3 1.5 1 2.5 2 2.5 0-3-.5-5 1-8z"/></svg>',
+    health:'<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg>',
+    go:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>',
+    rupee:'<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 6h10M7 10h10M9 6c4 0 5 2 5 4s-2 4-5 4h-1l6 6"/></svg>',
+    info:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>'
+  };
+  var mobile=!!document.getElementById('mWelcome');
+  function navBtn(p){return document.querySelector('.nav button[data-page="'+p+'"]');}
+  function hasRem(){return typeof window.kinsureIncentives==='function'&&!!navBtn('Incentives');}
+  function hasOwner(){return !!document.getElementById('kinsure-publish')||!!document.getElementById('kOwnerBtn');}
+  var logo=document.querySelector('.brand-logo');
+  var h='';
+  h+='<div class="kb-top">'+(logo?'<img src="'+logo.getAttribute('src')+'" alt="K-CUBE logo">':'')+'</div>';
+  h+='<div class="kb-head"><div><h1 class="kb-title">K-iNSURE</h1><p class="kb-lead">Premium calculator for Motor, Fire &amp; Health</p></div><span class="kb-pill">'+ICON.info+'TRIAL VERSION</span></div>';
+  h+='<div class="kb-grid">';
+  h+='<button type="button" class="kb-tile kb-motor" data-kb="motor"><span class="kb-row">'+ICON.car+'<span class="kb-go">'+ICON.go+'</span></span><span><span class="kb-t" style="display:block">Motor</span><span class="kb-s" style="display:block">Private · Two Wheeler · Commercial · EV</span></span></button>';
+  h+='<button type="button" class="kb-tile kb-fire" data-kb="fire">'+ICON.fire+'<span><span class="kb-t" style="display:block">Fire</span><span class="kb-s" style="display:block">Standard Fire · Bharat Griha Raksha · Industrial</span></span></button>';
+  h+='<button type="button" class="kb-tile kb-health" data-kb="health">'+ICON.health+'<span><span class="kb-t" style="display:block">Health</span><span class="kb-s" style="display:block">IHP · Family Medicare · Super Top-Up · Yuvaan</span></span></button>';
+  if(hasRem()) h+='<button type="button" class="kb-tile kb-rem" data-kb="rem"><span class="kb-ic">'+ICON.rupee+'</span><span><span class="kb-t" style="display:block">Remuneration</span><span class="kb-s" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--kb-muted)">Commission &amp; incentive <span class="kb-pill" style="padding:2px 8px;font-size:10.5px">AGENTS ONLY</span></span></span></button>';
+  if(hasOwner()){
+    h+='<div class="kb-sec kb-owner">OWNER</div><div class="kb-ownergrid">';
+    h+='<button type="button" class="kb-tile kb-mini kb-white kb-owner" data-kb="quotes"><span class="kb-lab">Saved quotations</span><span class="kb-val">Open list →</span></button>';
+    h+='<button type="button" class="kb-tile kb-mini kb-white kb-owner" data-kb="tariff"><span class="kb-lab">Tariff &amp; Rates</span><span class="kb-val">View and publish →</span></button>';
+    h+='<button type="button" class="kb-tile kb-mini kb-white kb-owner" data-kb="settings"><span class="kb-lab">Settings</span><span class="kb-val">Stamp, defaults →</span></button>';
+    h+='<button type="button" class="kb-tile kb-mini kb-white kb-owner" data-kb="new"><span class="kb-lab" style="display:flex;align-items:center;gap:8px">What\'s new <span class="kb-pill" style="padding:2px 8px;font-size:10.5px">NEW</span></span><span class="kb-val">Latest updates →</span></button>';
+    h+='</div>';
+  }
+  h+='</div>';
+  h+='<div class="kb-foot">Some features are still in development<br>All rights reserved · Kota Kishore Kumar · <a href="https://kota112457.uii.ms" target="_blank" rel="noopener">Kota112457.uii.ms</a></div>';
+  var sec=document.createElement(mobile?'div':'section');sec.id='kBento';sec.innerHTML=h;
+  var host=mobile?document.getElementById('mWelcome'):document.getElementById('dashboardView');
+  if(!host)return;
+  if(mobile){var slot=document.getElementById('mRoleSlot');host.insertBefore(sec,slot?slot.nextSibling:host.firstChild);}else host.insertBefore(sec,host.firstChild);
+  document.body.classList.add('kb-on');
+  if(!mobile){var ft=sec.querySelector('.kb-foot');if(ft){ft.style.marginTop='24px';host.appendChild(ft);}}
+  function go(k){
+    var files={motor:'motor.html',fire:'fire.html',health:'health.html'};
+    if(files[k]){
+      if(mobile&&window.kmOpen)return kmOpen(files[k]);
+      return openModule(files[k],navBtn(k==='motor'?'Motor Calculator':k==='fire'?'Fire Calculator':'Health Calculator'));
+    }
+    var pages={rem:'Incentives',quotes:'Quotations',tariff:'Tariff & Rates',settings:'Settings'};
+    if(pages[k]){
+      if(mobile&&window.kmPage)return kmPage(pages[k]);
+      var b=navBtn(pages[k]);if(b)b.click();return;
+    }
+    if(k==='new'){location.href='whats-new.html';return;}
+    if(k==='install'){
+      if(window.kInstallOpen)return kInstallOpen();
+      var ib=document.getElementById('kInstallBtn');if(ib){ib.click();return;}
+      alert('To install: open the browser menu and choose "Install app" or "Add to Home screen".');
+    }
+  }
+  sec.addEventListener('click',function(e){var t=e.target.closest('[data-kb]');if(t)go(t.getAttribute('data-kb'));});
+  function syncOwner(){document.body.classList.toggle('kb-owner-on',typeof kinsureRole!=='undefined'&&kinsureRole==='owner');}
+  var ou=window.updateRoleUI;
+  if(typeof ou==='function'){window.updateRoleUI=updateRoleUI=function(){var r=ou.apply(this,arguments);syncOwner();return r;};}
+  syncOwner();
+})();
+</script>
+<!-- ===== /K-iNSURE Bento ===== -->
 
 <style id="kinsure-edition">
 /* K-iNSURE: edition badge and layout touches */
-.k-edition{margin:2px 14px 10px;padding:5px 10px;border-radius:999px;font:800 11px/1.2 system-ui,sans-serif;letter-spacing:.12em;text-align:center;background:#E8590C;color:#0B1730}
+.k-edition{margin:2px 14px 10px;padding:5px 10px;border-radius:999px;font:800 11px/1.2 system-ui,sans-serif;letter-spacing:.12em;text-align:center;background:#FFC21A;color:#0B1730}
 .topline .kinsure{display:flex;align-items:center;gap:10px}
-.k-edition-top{font-style:normal;padding:3px 9px;border-radius:999px;font:800 10px/1.2 system-ui,sans-serif;letter-spacing:.1em;background:#E8590C;color:#0B1730}
+.k-edition-top{font-style:normal;padding:3px 9px;border-radius:999px;font:800 10px/1.2 system-ui,sans-serif;letter-spacing:.1em;background:#FFC21A;color:#0B1730}
 html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6) body #dashboardView .cards .k-rem-card{grid-column:1/-1;border-top:4px solid #FFC21A!important;background:linear-gradient(110deg,#0B1730,#22365F)!important}
 html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6) body #dashboardView .cards .k-rem-card h2{color:#FFC21A!important}
 html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6) body #dashboardView .cards .k-rem-card p{color:#dbe4f3!important}
 html:not(#z1):not(#z2):not(#z3):not(#z4):not(#z5):not(#z6) body #dashboardView .cards .k-rem-card .moduleicon{background:#FFF3C4!important}
-.k-owner-btn{margin:8px 14px 4px;padding:9px 12px;border-radius:10px;border:1px solid #E8590C;background:transparent;color:#fff;font:700 13px system-ui,sans-serif;cursor:pointer;text-align:left}
-.k-owner-btn.on{background:#E8590C;color:#0B1730}
+.k-owner-btn{margin:8px 14px 4px;padding:9px 12px;border-radius:10px;border:1px solid #FFC21A;background:transparent;color:#fff;font:700 13px system-ui,sans-serif;cursor:pointer;text-align:left}
+.k-owner-btn.on{background:#FFC21A;color:#0B1730}
 @media (max-width:760px){.k-edition{display:none}.k-owner-btn{display:none}}
 </style>
 <script id="kinsure-owner-btn">

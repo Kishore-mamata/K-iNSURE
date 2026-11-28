@@ -9,13 +9,13 @@ def rep(s,a,b,n=1):
     assert s.count(a)==n,(s.count(a),a[:70]); return s.replace(a,b)
 
 ED={
- 'P':   dict(file='K-iNSURE-P.html',name='K-iNSURE-P',short='K-iNSURE-P',sub='PUBLIC EDITION',badge='PUBLIC',color='#2BB3A8',
+ 'P':   dict(file='K-iNSURE-P.html',name='K-iNSURE-P',short='K-iNSURE-P',sub='PUBLIC EDITION',badge='PUBLIC',color='#8FB3F5',
              h1='Welcome to K-iNSURE',lead='Quick, clear premium quotes for Motor, Fire and Health insurance.',
              desc='Free premium calculator for Motor, Fire and Health insurance.'),
  'BAGS':dict(file='K-iNSURE-BAGS.html',name='K-iNSURE-BAGS',short='K-iNSURE BAGS',sub='AGENTS EDITION',badge='AGENTS',color='#FFC21A',
              h1='Welcome, Agent',lead='Premium calculators for Motor, Fire and Health, plus your remuneration.',
              desc='K-iNSURE for insurance agents: premium calculators and remuneration.'),
- 'D':   dict(file='K-iNSURE.html',name='K-iNSURE',short='K-iNSURE',sub='OWNER DESKTOP',badge='OWNER DESKTOP',color='#E8590C',
+ 'D':   dict(file='K-iNSURE.html',name='K-iNSURE',short='K-iNSURE',sub='OWNER DESKTOP',badge='OWNER DESKTOP',color='#FFC21A',
              h1='Welcome to K-iNSURE',lead='Owner desktop: calculators, remuneration, tariffs, quotations and settings.',
              desc='K-iNSURE owner desktop edition.'),
 }
