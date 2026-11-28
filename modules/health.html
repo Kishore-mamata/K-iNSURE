@@ -3819,7 +3819,11 @@ html:not(#b1):not(#b2):not(#b3):not(#b4):not(#b5):not(#b6):not(#b7):not(#b8):not
 </html>
 <style id="kinsure-desktop-bigger-text">
 /* v1.6.6: larger text on wide computer screens (laptops and phones unchanged). */
-@media (min-width:1450px){ html{zoom:1.12} }
+/* v1.6.26: larger text across the calculator, in proportion; print and PDF unchanged. */
+@media (min-width:1450px){ html{zoom:1.2} }
+@media (min-width:1000px) and (max-width:1449px){ html{zoom:1.1} }
+@media (max-width:999px){ html{zoom:1.06} }
+@media print{ html{zoom:1!important} }
 </style>
 
 <script id="kinsure-no-flash-end">(function(){function show(){requestAnimationFrame(function(){document.documentElement.style.visibility="";});}if(document.readyState==="complete")show();else window.addEventListener("load",show);})();</script>
