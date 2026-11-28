@@ -260,7 +260,7 @@ function updateRoleUI(){
 function syncEmbeddedModuleRole(){
   const frame=document.getElementById('moduleFrame');
   if(frame && frame.contentWindow){
-    frame.contentWindow.postMessage({type:'kinsure-role-update',role:kinsureRole},'*');
+    frame.contentWindow.postMessage({type:'kinsure-role-update',role:kinsureRole},window.origin);
   }
 }
 const KINSURE_OWNER_SALT='K-iNSURE-owner-v1';

@@ -1364,6 +1364,7 @@ function lockRates(){
 }
 // v1.6.16: when the main app is signed in as Owner, Fire is unlocked too; switching to User locks it.
 window.addEventListener("message",ev=>{
+  if(!(ev.source===window.parent&&ev.origin===window.origin))return;
   if(!ev.data||ev.data.type!=="kinsure-role-update")return;
   KINSURE_MAIN_ROLE=ev.data.role==="owner"?"owner":"user";
   OWNER_UNLOCKED=KINSURE_MAIN_ROLE==="owner";
@@ -1946,6 +1947,7 @@ syncLockUI();
     if(!owner)panel.open=false;
   }
   window.addEventListener('message',function(event){
+    if(!(event.source===window.parent&&event.origin===window.origin))return;
     if(event.data&&event.data.type==='kinsure-role-update')applyKinsureRole(event.data.role);
   });
   applyKinsureRole('user');

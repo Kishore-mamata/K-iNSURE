@@ -3635,9 +3635,9 @@ const MOTOR={
    rates:[[3.284,3.448,3.612],[3.366,3.534,3.703],[3.448,3.620,3.793]],
    ratesB:[[3.191,3.351,3.510],[3.271,3.435,3.598],[3.351,3.519,3.686]],disc:70,act:[6040,7940,10523],seatTP:[1162,978,1117],nd:"basic",imt:true,ll:true,seats:"Seating capacity (passengers)"},
  etaxi:{name:"E-PCV (Taxi)",zones:true,terms:[1],ages:["Up to 5 years","5 to 7 years","Above 7 years"],dimLabel:"Motor power",dims:["Not exceeding 30 kW","Above 30 kW and not exceeding 65 kW","Above 65 kW"],
-   /* PROVISIONAL OD proxy only: maps the three power bands to the available Taxi OD columns (up to 1000 CC; 1001–1500 CC; highest available Taxi OD rate). Replace when approved Electric Taxi OD rates are supplied. */
-   rates:[[3.448,3.612,3.612],[3.534,3.703,3.703],[3.620,3.793,3.793]],
-   ratesB:[[3.351,3.510,3.510],[3.435,3.598,3.598],[3.519,3.686,3.686]],disc:70,act:[5134,6749,8945],seatTP:[988,831,949],nd:"basic",imt:true,ll:true,seats:"Licensed passenger capacity (up to 6)"},
+   /* v1.6.17: E-PCV Taxi OD tariff supplied by user (28 Nov 2026). Rows = vehicle age; columns = motor power. Same rate for all kW bands. */
+   rates:[[3.284,3.284,3.284],[3.366,3.366,3.366],[3.448,3.448,3.448]],
+   ratesB:[[3.191,3.191,3.191],[3.271,3.271,3.271],[3.351,3.351,3.351]],disc:70,act:[5134,6749,8945],seatTP:[988,831,949],nd:"basic",imt:true,ll:true,seats:"Licensed passenger capacity (up to 6)"},
  pauto:{name:"3W Pass Auto",ages:["Up to 5 years","5 to 10 years","Above 10 years"],dimLabel:"Zone",dims:["Zone C","Zone B","Zone A"],
    rates:[[1.26,1.272,1.278],[1.292,1.304,1.31],[1.323,1.336,1.342]],disc:40,actFlat:2371,seatTPFlat:1134,nd:"disc",imt:true,ll:true,seats:"Seating capacity"},
  gauto:{name:"3W Goods Auto",ages:["Up to 5 years","5 to 10 years","Above 10 years"],dimLabel:"Zone",dims:["Zone C","Zone B","Zone A"],
@@ -8089,6 +8089,7 @@ body.sotp.sotp-nocng .cols > section[aria-label="Coverages"] { display:none !imp
     });
   }
   window.addEventListener('message',function(event){
+    if(!(event.source===window.parent&&event.origin===window.origin))return;
     if(event.data&&event.data.type==='kinsure-role-update')applyKinsureRole(event.data.role);
   });
   applyKinsureRole('user');
@@ -8663,6 +8664,7 @@ body:not(.k-owner) .k-owner-only{display:none!important}
     if(!owner&&panel&&!panel.hidden)switchKinsureTab('tab-motor');
   }
   window.addEventListener('message',function(e){
+    if(!(e.source===window.parent&&e.origin===window.origin))return;
     if(e.data&&e.data.type==='kinsure-role-update')setRole(e.data.role);
   });
   setRole('user');
